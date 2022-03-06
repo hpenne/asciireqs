@@ -1,0 +1,59 @@
+= Sample requirement specification
+:toc: macro
+:toclevels: 4
+:disclosure: Not for everyone
+:req-children: sub-spec.adoc
+
+This is a page after the cover, where approval and history will go.
+
+<<<
+
+toc::[]
+
+== Scope
+
+== Context
+
+== Functional requirements
+
+=== Requirement test
+This is a requirement table:
+[.reqs]
+[cols="2,4,1,2"]
+|===
+|ID |Text |Tags |Parent
+
+|UR-XXX-REQ-1234
+|The product shall be nice
+|Rel-1
+|SSS-XXX-REQ-123
+
+|UR-XXX-REQ-1235
+|The product shall be fast
+|Rel-1
+|SSS-XXX-REQ-124
+|===
+
+Text outside of tables can contain non-normative text on any format possible.
+
+This is a single requirement standing on its own:
+[.req]
+[cols="1,1,1"]
+|===
+|[[UR-XXX-REQ-0123]]UR-XXX-REQ-0123
+|Parent: SSS-XXX-REQ-123
+|Tags: Rel-1
+3+|This is where the requirement description goes. This requirement relates to <<UR-XXX-REQ-0123>>
+|===
+
+And this is another one:
+[.req]
+[cols="1,1,1"]
+|===
+|UR-XXX-REQ-0124
+|Parent: SSS-XXX-REQ-124
+|Tags: Rel-1
+3+|This is where the requirement description goes
+|===
+
+== Non functional requirements
