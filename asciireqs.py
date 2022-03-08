@@ -2,7 +2,8 @@
 
 import argparse
 import re
-from reqdocument import *
+from reqdocument import ReqDocument
+from reporting import write_spec_hierarchy, write_table
 
 from typing import Iterable
 from typing import Optional
@@ -129,13 +130,6 @@ def read_and_parse_hierarchy(file_name: str) -> ReqDocument:
     return doc
 
 
-def write_hiearchy_as_list(file, doc: ReqDocument, preamble: str):  # Type hint for file
-    preamble = preamble + '*'
-    file.write(f'{preamble} {doc.get_name()}\n')
-    for sub_doc in doc.get_children():
-        write_hiearchy_as_list(file, sub_doc, preamble)
-
-
 def main():
     parser = argparse.ArgumentParser(description="Get requirements from an asciidoc file")
     parser.add_argument('reqdoc', help="File to parse")
@@ -157,7 +151,9 @@ def main():
         with open(args.report, 'w') as report_file:
             report_file.write(f'= Requirements analysis report for {args.reqdoc}\n\n')
             report_file.write('== Requirement document hierarchy\n\n')
-            write_hiearchy_as_list(report_file, doc, '')
+            write_spec_hierarchy(report_file, doc, '')
+            report_file.write('== Requirements for release 1\n\n')
+            write_table(report_file, doc, ['ID', 'Text', 'Tags'], 'has_element(req["Tags"], "Rel-1")')
 
 
 if __name__ == "__main__":
