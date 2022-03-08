@@ -20,8 +20,12 @@ def has_element(s: str, sub_str: str) -> bool:
 
 def evaluate_requirement_against_filter(req: Requirement, filter_expression: str):
     try:
-        # ToDo: Security
-        return eval(filter_expression, {}, {'req': req, 'has_element': has_element})
+        allowed_names = {'req': req, 'has_element': has_element}
+        code = compile(filter_expression, "<string>", "eval")
+        for name in code.co_names:
+            if name not in allowed_names:
+                raise NameError(f"Use of {name} not allowed")
+        return eval(filter_expression, {"__builtins__": {}}, allowed_names)
     except KeyError as e:
         return False  # ToDo: Propagate, location
     except NameError as e:
