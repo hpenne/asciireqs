@@ -3,6 +3,7 @@
 from __future__ import annotations
 from typing import List
 from typing import Dict
+from typing import Iterable
 
 Requirement = Dict[str, str]
 Requirements = Dict[str, Requirement]
@@ -38,6 +39,10 @@ class ReqDocument:
         assert req_id
         self._reqs[req_id] = requirement
 
+    def add_reqs(self, requirements: Iterable[Requirement]) -> None:
+        for requirement in requirements:
+            self.add_req(requirement)
+
     def set_child_doc_files(self, child_docs: List[str]) -> None:
         self._child_files = child_docs
 
@@ -62,8 +67,7 @@ def test_reqs() -> None:
     d = ReqDocument()
     r1 = {'ID': 'a', 'Text': 'foo'}
     r2 = {'ID': 'b', 'Text': 'bar'}
-    d.add_req(r1)
-    d.add_req(r2)
+    d.add_reqs((r1, r2))
     assert d.get_reqs() == {'a': r1, 'b': r2}
 
 
