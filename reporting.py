@@ -6,7 +6,7 @@ from typing import List, TextIO
 from typing import Optional
 
 
-def write_spec_hierarchy(file: TextIO, doc: ReqDocument, preamble: str) -> None:  # Type hint for file
+def write_spec_hierarchy(file: TextIO, doc: ReqDocument, preamble: str) -> None:
     preamble = preamble + '*'
     file.write(f'{preamble} {doc.get_name()}\n')
     for sub_doc in doc.get_children():
