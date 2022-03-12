@@ -77,14 +77,19 @@ def req_from_single_req_table(table_lines: Table) -> Optional[Requirement]:
     for cell in sum(table_lines, [])[1:]:
         if cell:
             parts = [part.strip() for part in cell.split(':')]
-            if len(parts) != 2 or not parts[0] or not parts[1]:
+            if len(parts) == 1:
                 if 'Text' in req:
                     print(
                         f"Error in single req. table: Second non-property/value pair found (only one allowed): {cell}")
                     return None
                 req['Text'] = cell
             else:
-                req[parts[0]] = parts[1]
+                if parts[0]:
+                    req[parts[0]] = parts[1]
+                else:
+                    print(
+                        f"Error in single req. table: Property name not found: {cell}")
+                    return None
     return req
 
 
