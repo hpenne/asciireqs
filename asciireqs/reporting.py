@@ -1,9 +1,9 @@
 """reporting - functions to output tables etc. to asciidoc reports"""
 
-from reqdocument import ReqDocument
-from reqdocument import Requirement
 from typing import List, TextIO
 from typing import Optional
+from reqdocument import ReqDocument
+from reqdocument import Requirement
 from docparser import Project
 
 
@@ -27,22 +27,26 @@ def split_req_list(s: str) -> List[str]:
     return reqs
 
 
+def missing_link_from_parent(requirement: Requirement, project: Project) -> bool:
+    if 'Parent' not in requirement.keys():
+        return False
+    for parent_id in split_req_list(requirement['Parent']):
+        parent_req = project.requirements[parent_id]
+        if 'Child' not in parent_req:
+            return True
+        parent_req = project.requirements[parent_id]
+        if 'Child' not in parent_req:
+            return True
+        parent_children_id = split_req_list(parent_req['Child'])
+        if not requirement['ID'] in parent_children_id:
+            return True
+    return False
+
+
 def evaluate_requirement_against_filter(req: Requirement, project: Project, filter_expression: str) -> bool:
     try:
         def missing_down_link(requirement: Requirement) -> bool:
-            if 'Parent' not in requirement.keys():
-                return False
-            for parent_id in split_req_list(requirement['Parent']):
-                parent_req = project.requirements[parent_id]
-                if 'Child' not in parent_req:
-                    return True
-                parent_req = project.requirements[parent_id]
-                if 'Child' not in parent_req:
-                    return True
-                parent_children_id = split_req_list(parent_req['Child'])
-                if not req['ID'] in parent_children_id:
-                    return True
-            return False
+            return missing_link_from_parent(requirement, project)
 
         allowed_names = {'req': req, 'has_element': has_element, 'link_error': missing_down_link}
         code = compile(filter_expression, "<string>", "eval")

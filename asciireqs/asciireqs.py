@@ -1,10 +1,8 @@
 #!/usr/bin/env python3
 
 import argparse
-from reqdocument import ReqDocument
 from reporting import write_spec_hierarchy, write_table
 from docparser import read_and_parse_project
-from docparser import Project
 
 
 # ToDo: Global dictionary for all reqs in project model
