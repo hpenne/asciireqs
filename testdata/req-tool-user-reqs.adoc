@@ -52,7 +52,7 @@ This is a requirement table:
 [cols="1,1,1"]
 |===
 |UR-RMS-REQ-021
-|Child:
+|Child: SW-RMS-REQ-021
 |Tags: Rel-1
 3+|The SW shall support hierarchical specifications documents, and links between parent and child requirements.
 |===
@@ -68,7 +68,7 @@ This is a requirement table:
 |UR-RMS-REQ-031
 |The SW shall support exporting requirements tables to other formats
 |Rel-1
-|
+|SW-RMS-REQ-031
 
 |UR-RMS-REQ-032
 |The SW shall support analysis of requirements links between parent and child.
@@ -78,7 +78,7 @@ This is a requirement table:
 |UR-RMS-REQ-033
 |The SW shall be able to generate reports based on filters.
 |Rel-2
-|
+|SW-RMS-REQ-036
 
 |===
 

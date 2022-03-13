@@ -19,9 +19,32 @@ def has_element(s: str, sub_str: str) -> bool:
     return s.find(sub_str) >= 0
 
 
-def evaluate_requirement_against_filter(req: Requirement, filter_expression: str) -> bool:
+def split_req_list(s: str) -> List[str]:
+    reqs: List[str] = []
+    for r in s.split(','):
+        req = r.strip()
+        reqs.append(req)
+    return reqs
+
+
+def evaluate_requirement_against_filter(req: Requirement, project: Project, filter_expression: str) -> bool:
     try:
-        allowed_names = {'req': req, 'has_element': has_element}
+        def missing_down_link(requirement: Requirement) -> bool:
+            if 'Parent' not in requirement.keys():
+                return False
+            for parent_id in split_req_list(requirement['Parent']):
+                parent_req = project.requirements[parent_id]
+                if 'Child' not in parent_req:
+                    return True
+                parent_req = project.requirements[parent_id]
+                if 'Child' not in parent_req:
+                    return True
+                parent_children_id = split_req_list(parent_req['Child'])
+                if not req['ID'] in parent_children_id:
+                    return True
+            return False
+
+        allowed_names = {'req': req, 'has_element': has_element, 'link_error': missing_down_link}
         code = compile(filter_expression, "<string>", "eval")
         for name in code.co_names:
             if name not in allowed_names:
@@ -51,7 +74,7 @@ def write_table(file: TextIO, project: Project, fields: List[str], filter_expres
         file.write(f'|{field} ')
     file.write('\n\n')
     for req in project.requirements.values():
-        if evaluate_requirement_against_filter(req, filter_expression):
+        if evaluate_requirement_against_filter(req, project, filter_expression):
             line = table_line(req, fields)
             if line:
                 file.write(line)

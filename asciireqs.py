@@ -38,6 +38,8 @@ def main() -> None:
             write_spec_hierarchy(report_file, project.root_document, '')
             report_file.write('== Requirements for release 1\n\n')
             write_table(report_file, project, ['ID', 'Text', 'Tags'], 'has_element(req["Tags"], "Rel-1")')
+            report_file.write('== Requirements with missing links from parent\n\n')
+            write_table(report_file, project, ['ID', 'Text', 'Tags'], 'link_error(req)')
 
 
 if __name__ == "__main__":

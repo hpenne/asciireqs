@@ -75,7 +75,7 @@ This a sample SW requirement specification for testing of asciireqs, containing 
 |SW-RMS-REQ-036
 |The SW shall be able to generate reports based on general requirement attribute filters.
 |Rel-2
-|
+|UR-RMS-REQ-033
 
 |===
 
