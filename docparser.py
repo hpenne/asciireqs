@@ -1,12 +1,22 @@
 """docparser - Contains functions to scan an asciidoc file for requirements"""
 
 import re
+from copy import copy
 from typing import Iterable
 from typing import Optional
 from typing import List
 from typing import Tuple
 from reqdocument import ReqDocument
 from reqdocument import Requirement
+from reqdocument import Requirements
+from dataclasses import dataclass
+
+
+@dataclass
+class Project:
+    root_document: ReqDocument
+    requirements: Requirements
+
 
 Cells = List[str]
 Row = Cells
@@ -123,6 +133,25 @@ def parse_doc(lines: Iterable[Tuple[int, str]]) -> ReqDocument:
                 doc.set_child_doc_files([file_name.strip() for file_name in attribute_vale.split(',')])
                 print(f"Children: {doc.get_child_doc_files()}")
     return doc
+
+
+def read_and_parse(file_name: str) -> ReqDocument:
+    with open(file_name) as file:
+        doc = parse_doc(enumerate(file, start=1))
+        doc.set_name(file_name.split('.')[0])
+        for req in doc.get_reqs().values():
+            print(req)
+        return doc
+
+
+def read_and_parse_project(file_name: str) -> Project:
+    doc = read_and_parse(file_name)
+    requirements = copy(doc.get_reqs())
+    for sub_file_name in doc.get_child_doc_files():
+        child_doc = read_and_parse(sub_file_name)
+        doc.add_child_doc(child_doc)
+        requirements |= child_doc.get_reqs()  # ToDo: Check for duplicates
+    return Project(doc, requirements)
 
 
 def test_table() -> None:

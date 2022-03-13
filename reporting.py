@@ -4,6 +4,7 @@ from reqdocument import ReqDocument
 from reqdocument import Requirement
 from typing import List, TextIO
 from typing import Optional
+from docparser import Project
 
 
 def write_spec_hierarchy(file: TextIO, doc: ReqDocument, preamble: str) -> None:
@@ -44,12 +45,12 @@ def table_line(req: Requirement, fields: List[str]) -> Optional[str]:
         return None  # ToDo: Propagate, location
 
 
-def write_table(file: TextIO, doc: ReqDocument, fields: List[str], filter_expression: str) -> None:
+def write_table(file: TextIO, project: Project, fields: List[str], filter_expression: str) -> None:
     file.write('|===\n')
     for field in fields:
         file.write(f'|{field} ')
     file.write('\n\n')
-    for req in doc.get_reqs().values():
+    for req in project.requirements.values():
         if evaluate_requirement_against_filter(req, filter_expression):
             line = table_line(req, fields)
             if line:
