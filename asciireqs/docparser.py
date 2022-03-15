@@ -1,6 +1,7 @@
 """docparser - Contains functions to scan an asciidoc file for requirements"""
 
 import re
+import os
 from copy import copy
 from typing import Iterable
 from typing import Optional
@@ -144,11 +145,12 @@ def read_and_parse(file_name: str) -> ReqDocument:
         return doc
 
 
-def read_and_parse_project(file_name: str) -> Project:
-    doc = read_and_parse(file_name)
+def read_and_parse_project(file_path: str) -> Project:
+    path, file_name = os.path.split(file_path)
+    doc = read_and_parse(file_path)
     requirements = copy(doc.get_reqs())
     for sub_file_name in doc.get_child_doc_files():
-        child_doc = read_and_parse(sub_file_name)
+        child_doc = read_and_parse(os.path.join(path, sub_file_name))
         doc.add_child_doc(child_doc)
         requirements |= child_doc.get_reqs()  # ToDo: Check for duplicates
     return Project(doc, requirements)
