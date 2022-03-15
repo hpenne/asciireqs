@@ -14,20 +14,11 @@ from docparser import read_and_parse_project
 def main() -> None:
     parser = argparse.ArgumentParser(description='Get requirements from an asciidoc file')
     parser.add_argument('reqdoc', help='File to parse')
-    parser.add_argument('-csv', help='File to export requirements to', type=str)
-    parser.add_argument('-report')
-    parser.add_argument('-o', help='Output directory')
+    parser.add_argument('-report', help='Generate report')
+    parser.add_argument('-o', '--outputdir', dest='output_dir', type=str, help='Output directory')
     args = parser.parse_args()
 
     project = read_and_parse_project(args.reqdoc)
-
-    if args.csv:
-        with open(args.csv, 'w') as csv_file:
-            csv_file.write(','.join(project.root_document.get_keys()))
-            csv_file.write('\n')
-            for req in project.root_document.get_reqs().values():
-                csv_file.write(','.join(req[key] if key in req else '' for key in project.root_document.get_keys()))
-                csv_file.write('\n')
 
     if args.report:
         with open(args.report, 'w') as report_file:
