@@ -2,7 +2,6 @@
 
 import argparse
 import os
-
 import sys
 
 from asciireqs.docparser import read_and_parse_project

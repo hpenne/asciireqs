@@ -1,12 +1,12 @@
 """reporting - functions to output tables etc. to asciidoc reports"""
 
 from typing import Iterable
-from typing import Optional
 from typing import List
+from typing import Optional
 from typing import Tuple
+from asciireqs.docparser import Project
 from asciireqs.reqdocument import ReqDocument
 from asciireqs.reqdocument import Requirement
-from asciireqs.docparser import Project
 
 
 def get_spec_hierarchy(doc: ReqDocument, preamble: str) -> List[str]:

@@ -1,9 +1,9 @@
 """reqdocument - type for holding all information scanned from an asciidoc file"""
 
 from __future__ import annotations
-from typing import List
 from typing import Dict
 from typing import Iterable
+from typing import List
 
 Requirement = Dict[str, str]
 Requirements = Dict[str, Requirement]
@@ -49,8 +49,8 @@ class ReqDocument:
     def get_child_doc_files(self) -> List[str]:
         return self._child_files
 
-    def add_child_doc(self, child_doc: ReqDocument) -> None:  # ToDo: Type hints using "Self"
+    def add_child_doc(self, child_doc: ReqDocument) -> None:
         self._child_docs.append(child_doc)
 
-    def get_children(self) -> List[ReqDocument]:  # ToDo: Type hints using "Self"
+    def get_children(self) -> List[ReqDocument]:
         return self._child_docs

@@ -2,15 +2,15 @@
 
 import re
 import os
-from copy import copy
-from typing import Iterable
-from typing import Optional
-from typing import List
-from typing import Tuple
-from dataclasses import dataclass
 from asciireqs.reqdocument import ReqDocument
 from asciireqs.reqdocument import Requirement
 from asciireqs.reqdocument import Requirements
+from copy import copy
+from dataclasses import dataclass
+from typing import Iterable
+from typing import List
+from typing import Optional
+from typing import Tuple
 
 
 @dataclass
