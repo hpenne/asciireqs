@@ -2,15 +2,15 @@
 
 import re
 import os
-from asciireqs.reqdocument import ReqDocument
-from asciireqs.reqdocument import Requirement
-from asciireqs.reqdocument import Requirements
 from copy import copy
 from dataclasses import dataclass
 from typing import Iterable
 from typing import List
 from typing import Optional
 from typing import Tuple
+from asciireqs.reqdocument import ReqDocument
+from asciireqs.reqdocument import Requirement
+from asciireqs.reqdocument import Requirements
 
 
 @dataclass
@@ -67,12 +67,14 @@ def get_table(lines: Iterable[Tuple[int, str]]) -> Tuple[Optional[Row], Optional
                 cells = cells + additional_cells * ['']
             if not num_columns:
                 num_columns = len(cells) - 1
-            append_cells(table_rows, num_columns, cells[1:])  # Drop the initial non-cell element we got from split()
+            append_cells(table_rows, num_columns,
+                         cells[1:])  # Drop the initial non-cell element we got from split()
         else:
             if line.rstrip() == '|===':
                 in_table = True
             elif not attributes.match(line):
-                print(f'Error on line {line_no}: Expected attributes or table start, but was: {line}')  # f-string
+                print(
+                    f'Error on line {line_no}: Expected attributes or table start, but was: {line}')  # f-string
                 return None, None
     return None, None
 
@@ -130,7 +132,8 @@ def parse_doc(lines: Iterable[Tuple[int, str]]) -> ReqDocument:
         else:
             attribute_vale = get_attribute(text, 'req-children')
             if attribute_vale:
-                doc.set_child_doc_files([file_name.strip() for file_name in attribute_vale.split(',')])
+                doc.set_child_doc_files(
+                    [file_name.strip() for file_name in attribute_vale.split(',')])
                 print(f"Children: {doc.get_child_doc_files()}")
     return doc
 

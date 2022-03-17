@@ -44,7 +44,8 @@ def missing_link_from_parent(requirement: Requirement, project: Project) -> bool
     return False
 
 
-def evaluate_requirement_against_filter(req: Requirement, project: Project, filter_expression: str) -> bool:
+def evaluate_requirement_against_filter(req: Requirement, project: Project,
+                                        filter_expression: str) -> bool:
     try:
         def missing_down_link(requirement: Requirement) -> bool:
             return missing_link_from_parent(requirement, project)
@@ -58,7 +59,8 @@ def evaluate_requirement_against_filter(req: Requirement, project: Project, filt
     except KeyError as _:
         return False  # ToDo: Propagate, location
     except NameError as exception:
-        print(f'ERROR: Failed to evaluate filter expression: {exception}')  # ToDo: Propagate, location
+        print(
+            f'ERROR: Failed to evaluate filter expression: {exception}')  # ToDo: Propagate, location
         return False
 
 
@@ -104,12 +106,12 @@ def generate_report_line(input_lines: Iterable[Tuple[int, str]], project: Projec
                 yield line
         elif stripped_line.startswith('`asciireq-table:') and stripped_line.endswith('`'):
             # ToDo: Error handling
-            field_name_list, filter_expression = [param.strip() for param in stripped_line[16:-1].strip().split(';')]
+            field_name_list, filter_expression = [param.strip() for param in
+                                                  stripped_line[16:-1].strip().split(';')]
             field_names = [name.strip() for name in field_name_list.strip().split(',')]
             for line in get_table(project, field_names, filter_expression):
                 yield line
         else:
             yield input_line
-
 
 # ToDo: Tests

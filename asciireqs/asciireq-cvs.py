@@ -23,7 +23,8 @@ def main() -> None:
         csv_file.write(','.join(project.root_document.get_keys()))
         csv_file.write('\n')
         for req in reqs:
-            csv_file.write(','.join(req[key] if key in req else '' for key in project.root_document.get_keys()))
+            csv_file.write(','.join(
+                req[key] if key in req else '' for key in project.root_document.get_keys()))
             csv_file.write('\n')
 
 
