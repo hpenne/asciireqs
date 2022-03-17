@@ -108,8 +108,7 @@ def get_attribute(line: str, name: str) -> Optional[str]:
     attribute = ':' + name + ':'
     if line.startswith(attribute):
         return line[len(attribute):].strip()
-    else:
-        return None
+    return None
 
 
 def parse_doc(lines: Iterable[Tuple[int, str]]) -> ReqDocument:
@@ -137,7 +136,7 @@ def parse_doc(lines: Iterable[Tuple[int, str]]) -> ReqDocument:
 
 
 def read_and_parse(file_name: str) -> ReqDocument:
-    with open(file_name) as file:
+    with open(file_name, 'r') as file:
         doc = parse_doc(enumerate(file, start=1))
         doc.set_name(file_name.split('.')[0])
         for req in doc.get_reqs().values():
@@ -146,7 +145,7 @@ def read_and_parse(file_name: str) -> ReqDocument:
 
 
 def read_and_parse_project(file_path: str) -> Project:
-    path, file_name = os.path.split(file_path)
+    path, _ = os.path.split(file_path)
     doc = read_and_parse(file_path)
     requirements = copy(doc.get_reqs())
     for sub_file_name in doc.get_child_doc_files():

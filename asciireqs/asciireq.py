@@ -7,11 +7,8 @@ import sys
 
 from asciireqs.docparser import read_and_parse_project
 from asciireqs.reporting import generate_report_line
-from asciireqs.reporting import get_spec_hierarchy
-from asciireqs.reporting import get_table
 
 
-# ToDo: Report template
 # ToDo: Section and line numbers in requirements attributes
 def main() -> None:
     parser = argparse.ArgumentParser(description='Get requirements from an asciidoc file')

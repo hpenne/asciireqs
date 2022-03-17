@@ -1,7 +1,6 @@
 """reporting - functions to output tables etc. to asciidoc reports"""
 
 from typing import Iterable
-from typing import TextIO
 from typing import Optional
 from typing import List
 from typing import Tuple
@@ -18,15 +17,14 @@ def get_spec_hierarchy(doc: ReqDocument, preamble: str) -> List[str]:
     return text
 
 
-def has_element(s: str, sub_str: str) -> bool:
-    return s.find(sub_str) >= 0
+def has_element(field_text: str, sub_str: str) -> bool:
+    return field_text.find(sub_str) >= 0
 
 
-def split_req_list(s: str) -> List[str]:
+def split_req_list(req_list: str) -> List[str]:
     reqs: List[str] = []
-    for r in s.split(','):
-        req = r.strip()
-        reqs.append(req)
+    for req in req_list.split(','):
+        reqs.append(req.strip())
     return reqs
 
 
@@ -57,10 +55,10 @@ def evaluate_requirement_against_filter(req: Requirement, project: Project, filt
             if name not in allowed_names:
                 raise NameError(f"Use of {name} not allowed")
         return eval(filter_expression, {"__builtins__": {}}, allowed_names) is True
-    except KeyError as e:
+    except KeyError as _:
         return False  # ToDo: Propagate, location
-    except NameError as e:
-        print(f'ERROR: Failed to evaluate filter expression: {e}')  # ToDo: Propagate, location
+    except NameError as exception:
+        print(f'ERROR: Failed to evaluate filter expression: {exception}')  # ToDo: Propagate, location
         return False
 
 

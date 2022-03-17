@@ -1,5 +1,5 @@
 import asciireqs.asciireq
 
 
-def main():
+def main() -> None:
     asciireqs.main()

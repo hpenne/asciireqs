@@ -2,7 +2,8 @@
 
 import argparse
 import os
-from docparser import read_and_parse_project
+from asciireqs.docparser import read_and_parse_project
+
 
 def main() -> None:
     parser = argparse.ArgumentParser(description='Get requirements from an asciidoc file')
