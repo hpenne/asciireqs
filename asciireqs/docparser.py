@@ -8,9 +8,9 @@ from typing import Optional
 from typing import List
 from typing import Tuple
 from dataclasses import dataclass
-from reqdocument import ReqDocument
-from reqdocument import Requirement
-from reqdocument import Requirements
+from asciireqs.reqdocument import ReqDocument
+from asciireqs.reqdocument import Requirement
+from asciireqs.reqdocument import Requirements
 
 
 @dataclass

@@ -1,4 +1,4 @@
-import asciireqs.asciireqs
+import asciireqs.asciireq
 
 
 def main():

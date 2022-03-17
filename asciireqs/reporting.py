@@ -1,18 +1,21 @@
 """reporting - functions to output tables etc. to asciidoc reports"""
 
-from typing import List, TextIO
+from typing import Iterable
+from typing import TextIO
 from typing import Optional
-from reqdocument import ReqDocument
-from reqdocument import Requirement
-from docparser import Project
+from typing import List
+from typing import Tuple
+from asciireqs.reqdocument import ReqDocument
+from asciireqs.reqdocument import Requirement
+from asciireqs.docparser import Project
 
 
-def write_spec_hierarchy(file: TextIO, doc: ReqDocument, preamble: str) -> None:
+def get_spec_hierarchy(doc: ReqDocument, preamble: str) -> List[str]:
     preamble = preamble + '*'
-    file.write(f'{preamble} {doc.get_name()}\n')
+    text: List[str] = [f'{preamble} {doc.get_name()}\n']
     for sub_doc in doc.get_children():
-        write_spec_hierarchy(file, sub_doc, preamble)
-    file.write('\n')
+        text += get_spec_hierarchy(sub_doc, preamble)
+    return text
 
 
 def has_element(s: str, sub_str: str) -> bool:
@@ -72,17 +75,43 @@ def table_line(req: Requirement, fields: List[str]) -> Optional[str]:
         return None  # ToDo: Propagate, location
 
 
-def write_table(file: TextIO, project: Project, fields: List[str], filter_expression: str) -> None:
-    file.write('|===\n')
+def get_table(project: Project, fields: List[str], filter_expression: str) -> List[str]:
+    table: List[str] = ['|===\n']
     for field in fields:
-        file.write(f'|{field} ')
-    file.write('\n\n')
+        table.append(f'|{field} ')
+    table.append('\n\n')
     for req in project.requirements.values():
         if evaluate_requirement_against_filter(req, project, filter_expression):
             line = table_line(req, fields)
             if line:
-                file.write(line)
-    file.write('|===\n')
+                table.append(line)
+    table.append('|===\n')
+    return table
+
+
+def find_report_macro(line: str) -> Tuple[Optional[str], List[str]]:
+    if line.startswith('asciireq-hierarchy'):
+        return 'asciireq-hierarchy', []
+    if line.startswith('asciireq-table:'):
+        params = [param.strip() for param in line[15:].strip().split(';')]
+        return 'asciireq-table:', params
+    return None, []
+
+
+def generate_report_line(input_lines: Iterable[Tuple[int, str]], project: Project) -> Iterable[str]:
+    for _, input_line in input_lines:
+        stripped_line: str = input_line.strip()
+        if stripped_line == '`asciireq-hierarchy`':
+            for line in get_spec_hierarchy(project.root_document, ''):
+                yield line
+        elif stripped_line.startswith('`asciireq-table:') and stripped_line.endswith('`'):
+            # ToDo: Error handling
+            field_name_list, filter_expression = [param.strip() for param in stripped_line[16:-1].strip().split(';')]
+            field_names = [name.strip() for name in field_name_list.strip().split(',')]
+            for line in get_table(project, field_names, filter_expression):
+                yield line
+        else:
+            yield input_line
 
 
 # ToDo: Tests
