@@ -16,6 +16,7 @@ class ReqDocument:
         self._reqs: Requirements = {}
         self._child_files: List[str] = []
         self._child_docs: List[ReqDocument] = []
+        self._req_prefix: str = ""
 
     def set_name(self, name: str) -> None:
         self._name = name
@@ -54,3 +55,9 @@ class ReqDocument:
 
     def get_children(self) -> List[ReqDocument]:
         return self._child_docs
+
+    def set_req_prefix(self, prefix: str) -> None:
+        self._req_prefix = prefix
+
+    def get_req_prefix(self) -> str:
+        return self._req_prefix

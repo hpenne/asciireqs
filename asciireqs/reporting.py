@@ -88,21 +88,21 @@ def get_table(project: Project, requirements: Requirements, fields: List[str],
 
 
 def generate_report_line(input_lines: Iterable[Tuple[int, str]], project: Project,
-                         requirements: Requirements) -> Iterable[str]:
-    for _, input_line in input_lines:
+                         requirements: Requirements) -> Iterable[Tuple[int, str]]:
+    for line_no, input_line in input_lines:
         stripped_line: str = input_line.strip()
         if stripped_line == '`asciireq-hierarchy`':
             for line in get_spec_hierarchy(project.root_document, ''):
-                yield line
+                yield line_no, line
         elif stripped_line.startswith('`asciireq-table:') and stripped_line.endswith('`'):
             # ToDo: Error handling
             field_name_list, filter_expression = [param.strip() for param in
                                                   stripped_line[16:-1].strip().split(';')]
             field_names = [name.strip() for name in field_name_list.strip().split(',')]
             for line in get_table(project, requirements, field_names, filter_expression):
-                yield line
+                yield line_no, line
         else:
-            yield input_line
+            yield line_no, input_line
 
 
 def post_process_hierarchically(project: Project, document: ReqDocument, output_dir: str):
@@ -110,8 +110,8 @@ def post_process_hierarchically(project: Project, document: ReqDocument, output_
     output_path = os.path.join(output_dir, output_file_name)
     with open(document.get_name(), 'r') as input_file:
         with open(output_path, 'w') as output_file:
-            for line in generate_report_line(enumerate(input_file, start=1), project,
-                                             document.get_reqs()):
+            for line_no, line in generate_report_line(enumerate(input_file, start=1), project,
+                                                      document.get_reqs()):
                 output_file.write(line)
     for sub_doc in document.get_children():
         post_process_hierarchically(project, sub_doc, output_dir)

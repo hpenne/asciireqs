@@ -1,16 +1,12 @@
 """docparser - Contains functions to scan an asciidoc file for requirements"""
 
-import re
 import os
+import re
 from copy import copy
 from dataclasses import dataclass
-from typing import Iterable
-from typing import List
-from typing import Optional
-from typing import Tuple
-from asciireqs.reqdocument import ReqDocument
-from asciireqs.reqdocument import Requirement
-from asciireqs.reqdocument import Requirements
+from typing import Iterable, List, Optional, Tuple
+
+from asciireqs.reqdocument import ReqDocument, Requirement, Requirements
 
 
 @dataclass
@@ -19,7 +15,8 @@ class Project:
     requirements: Requirements
 
 
-Cells = List[str]
+Cell = str
+Cells = List[Cell]
 Row = Cells
 Table = List[Row]
 
@@ -62,7 +59,8 @@ def get_table(lines: Iterable[Tuple[int, str]]) -> Tuple[Optional[Row], Optional
                 return None, None
             matches = column_merge.search(cells[0]) if cells[0] else None
             if matches:
-                # The line starts with a cell merge specifier, so generate None cells for the unused ones:
+                # The line starts with a cell merge specifier,
+                # so generate None cells for the unused ones:
                 additional_cells: int = int(matches.groups()[0]) - 1
                 cells = cells + additional_cells * ['']
             if not num_columns:
@@ -74,7 +72,7 @@ def get_table(lines: Iterable[Tuple[int, str]]) -> Tuple[Optional[Row], Optional
                 in_table = True
             elif not attributes.match(line):
                 print(
-                    f'Error on line {line_no}: Expected attributes or table start, but was: {line}')  # f-string
+                    f'Error on line {line_no}: Expected attributes or table start, but was: {line}')
                 return None, None
     return None, None
 
@@ -92,8 +90,8 @@ def req_from_single_req_table(table_lines: Table) -> Optional[Requirement]:
             parts = [part.strip() for part in cell.split(':')]
             if len(parts) == 1:
                 if 'Text' in req:
-                    print(
-                        f"Error in single req. table: Second non-property/value pair found (only one allowed): {cell}")
+                    print((f"Error in single req. table: Second non-property/value pair found"
+                           "(only one allowed): {cell}"))
                     return None
                 req['Text'] = cell
             else:
@@ -127,14 +125,16 @@ def parse_doc(lines: Iterable[Tuple[int, str]]) -> ReqDocument:
             if rows:
                 req = req_from_single_req_table(rows)
                 if req:
-                    doc.add_keys(list(req.keys()))  # ToDo: Keep order?
+                    doc.add_keys(list(req.keys()))
                     doc.add_req(req)
         else:
-            attribute_vale = get_attribute(text, 'req-children')
-            if attribute_vale:
+            attribute_value = get_attribute(text, 'req-children')
+            if attribute_value:
                 doc.set_child_doc_files(
-                    [file_name.strip() for file_name in attribute_vale.split(',')])
-                print(f"Children: {doc.get_child_doc_files()}")
+                    [file_name.strip() for file_name in attribute_value.split(',')])
+            attribute_value = get_attribute(text, 'req-prefix')
+            if attribute_value:
+                doc.set_req_prefix(attribute_value)
     return doc
 
 
