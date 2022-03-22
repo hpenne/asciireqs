@@ -5,7 +5,7 @@ import os
 import sys
 
 from asciireqs.docparser import read_and_parse_project
-from asciireqs.reporting import generate_report_line
+from asciireqs.reporting import generate_report_line, post_process_hierarchically
 
 
 # ToDo: Section and line numbers in requirements attributes
@@ -19,6 +19,9 @@ def main() -> None:
 
     project = read_and_parse_project(args.reqdoc)
 
+    if args.output_dir:
+        post_process_hierarchically(project, project.root_document, args.output_dir)
+
     if args.report_template:
         if not args.output_dir:
             sys.exit('--outputdir required when using --template')
@@ -27,7 +30,8 @@ def main() -> None:
                                    output_file_name) if args.output_dir else args.report
         with open(args.report_template, 'r') as template_file:
             with open(output_path, 'w') as report_file:
-                for line in generate_report_line(enumerate(template_file, start=1), project):
+                for line in generate_report_line(enumerate(template_file, start=1), project,
+                                                 project.requirements):
                     report_file.write(line)
 
 

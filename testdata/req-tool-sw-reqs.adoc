@@ -80,3 +80,7 @@ This a sample SW requirement specification for testing of asciireqs, containing 
 |===
 
 == Non functional requirements
+
+== Requirements for release 1
+
+`asciireq-table: ID, Text, Tags; has_element(req["Tags"], "Rel-1")`

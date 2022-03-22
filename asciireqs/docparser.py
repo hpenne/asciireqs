@@ -141,7 +141,7 @@ def parse_doc(lines: Iterable[Tuple[int, str]]) -> ReqDocument:
 def read_and_parse(file_name: str) -> ReqDocument:
     with open(file_name, 'r') as file:
         doc = parse_doc(enumerate(file, start=1))
-        doc.set_name(file_name.split('.')[0])
+        doc.set_name(file_name)
         for req in doc.get_reqs().values():
             print(req)
         return doc

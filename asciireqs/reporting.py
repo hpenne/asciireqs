@@ -1,12 +1,9 @@
 """reporting - functions to output tables etc. to asciidoc reports"""
 
-from typing import Iterable
-from typing import List
-from typing import Optional
-from typing import Tuple
+import os
+from typing import Iterable, List, Optional, Tuple
 from asciireqs.docparser import Project
-from asciireqs.reqdocument import ReqDocument
-from asciireqs.reqdocument import Requirement
+from asciireqs.reqdocument import ReqDocument, Requirement, Requirements
 
 
 def get_spec_hierarchy(doc: ReqDocument, preamble: str) -> List[str]:
@@ -75,12 +72,13 @@ def table_line(req: Requirement, fields: List[str]) -> Optional[str]:
         return None  # ToDo: Propagate, location
 
 
-def get_table(project: Project, fields: List[str], filter_expression: str) -> List[str]:
+def get_table(project: Project, requirements: Requirements, fields: List[str],
+              filter_expression: str) -> List[str]:
     table: List[str] = ['|===\n']
     for field in fields:
         table.append(f'|{field} ')
     table.append('\n\n')
-    for req in project.requirements.values():
+    for req in requirements.values():
         if evaluate_requirement_against_filter(req, project, filter_expression):
             line = table_line(req, fields)
             if line:
@@ -89,16 +87,8 @@ def get_table(project: Project, fields: List[str], filter_expression: str) -> Li
     return table
 
 
-def find_report_macro(line: str) -> Tuple[Optional[str], List[str]]:
-    if line.startswith('asciireq-hierarchy'):
-        return 'asciireq-hierarchy', []
-    if line.startswith('asciireq-table:'):
-        params = [param.strip() for param in line[15:].strip().split(';')]
-        return 'asciireq-table:', params
-    return None, []
-
-
-def generate_report_line(input_lines: Iterable[Tuple[int, str]], project: Project) -> Iterable[str]:
+def generate_report_line(input_lines: Iterable[Tuple[int, str]], project: Project,
+                         requirements: Requirements) -> Iterable[str]:
     for _, input_line in input_lines:
         stripped_line: str = input_line.strip()
         if stripped_line == '`asciireq-hierarchy`':
@@ -109,9 +99,21 @@ def generate_report_line(input_lines: Iterable[Tuple[int, str]], project: Projec
             field_name_list, filter_expression = [param.strip() for param in
                                                   stripped_line[16:-1].strip().split(';')]
             field_names = [name.strip() for name in field_name_list.strip().split(',')]
-            for line in get_table(project, field_names, filter_expression):
+            for line in get_table(project, requirements, field_names, filter_expression):
                 yield line
         else:
             yield input_line
+
+
+def post_process_hierarchically(project: Project, document: ReqDocument, output_dir: str):
+    _, output_file_name = os.path.split(document.get_name())
+    output_path = os.path.join(output_dir, output_file_name)
+    with open(document.get_name(), 'r') as input_file:
+        with open(output_path, 'w') as output_file:
+            for line in generate_report_line(enumerate(input_file, start=1), project,
+                                             document.get_reqs()):
+                output_file.write(line)
+    for sub_doc in document.get_children():
+        post_process_hierarchically(project, sub_doc, output_dir)
 
 # ToDo: Tests
