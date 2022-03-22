@@ -15,7 +15,24 @@ class Project:
     requirements: Requirements
 
 
-Cell = str
+@dataclass
+class Location:
+    line: int
+
+
+@dataclass
+class Cell:
+    data: str
+    location: Location
+
+    def empty(self) -> bool:
+        return not self.data
+
+
+def empty_cell():
+    return Cell('', Location(0))
+
+
 Cells = List[Cell]
 Row = Cells
 Table = List[Row]
@@ -53,16 +70,16 @@ def get_table(lines: Iterable[Tuple[int, str]]) -> Tuple[Optional[Row], Optional
                     heading_cells = table_rows[0]
                     table_rows = []
                 continue
-            cells: Cells = [cell.strip() for cell in line.split('|')]
+            cells: Cells = [Cell(cell.strip(), Location(line_no)) for cell in line.split('|')]
             if len(cells) < 2:
                 print(f'Error on line {line_no}, not table: {line}')
                 return None, None
-            matches = column_merge.search(cells[0]) if cells[0] else None
+            matches = column_merge.search(cells[0].data) if cells[0] else None
             if matches:
                 # The line starts with a cell merge specifier,
                 # so generate None cells for the unused ones:
                 additional_cells: int = int(matches.groups()[0]) - 1
-                cells = cells + additional_cells * ['']
+                cells = cells + additional_cells * [empty_cell()]
             if not num_columns:
                 num_columns = len(cells) - 1
             append_cells(table_rows, num_columns,
@@ -77,21 +94,24 @@ def get_table(lines: Iterable[Tuple[int, str]]) -> Tuple[Optional[Row], Optional
     return None, None
 
 
-def reqs_from_req_table(heading: Row, table_lines: Table) -> Iterable[Requirement]:
-    if table_lines:
-        for line in table_lines:
-            yield {heading[i]: column for (i, column) in enumerate(line)}
+def reqs_from_req_table(heading: Row, table_rows: Table) -> Iterable[Requirement]:
+    if table_rows:
+        for row in table_rows:
+            req = {heading[i].data: cell.data for (i, cell) in enumerate(row)}
+            req['_line'] = row[0].location.line
+            yield req
 
 
 def req_from_single_req_table(table_lines: Table) -> Optional[Requirement]:
     req = {'ID': table_lines[0][0]}  # First cell should be requirement ID
     for cell in sum(table_lines, [])[1:]:
         if cell:
-            parts = [part.strip() for part in cell.split(':')]
+            parts = [part.strip() for part in cell.data.split(':')]
             if len(parts) == 1:
                 if 'Text' in req:
-                    print((f"Error in single req. table: Second non-property/value pair found"
-                           "(only one allowed): {cell}"))
+                    if not cell.empty():
+                        print(("Error in single req. table: Second non-property/value pair found"
+                               f"(only one allowed): {cell}"))
                     return None
                 req['Text'] = cell
             else:
@@ -119,7 +139,7 @@ def parse_doc(lines: Iterable[Tuple[int, str]]) -> ReqDocument:
             heading, rows = get_table(lines)
             if heading and rows:
                 doc.add_reqs(reqs_from_req_table(heading, rows))
-                doc.add_keys(heading)
+                doc.add_keys([cell.data for cell in heading])
         elif text == '[.req]':
             heading, rows = get_table(lines)
             if rows:
