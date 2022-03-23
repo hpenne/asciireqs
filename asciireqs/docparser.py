@@ -7,6 +7,7 @@ from dataclasses import dataclass
 from typing import Iterable, List, Optional, Tuple
 
 from asciireqs.reqdocument import ReqDocument, Requirement, Requirements
+import asciireqs.fields as fields
 
 
 @dataclass
@@ -98,12 +99,12 @@ def reqs_from_req_table(heading: Row, table_rows: Table) -> Iterable[Requirement
     if table_rows:
         for row in table_rows:
             req = {heading[i].data: cell.data for (i, cell) in enumerate(row)}
-            req['_line'] = row[0].location.line
+            req[fields.LINE_NO] = row[0].location.line
             yield req
 
 
 def req_from_single_req_table(table_lines: Table) -> Optional[Requirement]:
-    req = {'ID': table_lines[0][0]}  # First cell should be requirement ID
+    req = {fields.ID: table_lines[0][0]}  # First cell should be requirement ID
     for cell in sum(table_lines, [])[1:]:
         if cell:
             parts = [part.strip() for part in cell.data.split(':')]

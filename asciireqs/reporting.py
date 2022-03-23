@@ -4,6 +4,7 @@ import os
 from typing import Iterable, List, Optional, Tuple
 from asciireqs.docparser import Project
 from asciireqs.reqdocument import ReqDocument, Requirement, Requirements
+import asciireqs.fields as fields
 
 
 def get_spec_hierarchy(doc: ReqDocument, preamble: str) -> List[str]:
@@ -36,7 +37,7 @@ def missing_link_from_parent(requirement: Requirement, project: Project) -> bool
         if 'Child' not in parent_req:
             return True
         parent_children_id = split_req_list(parent_req['Child'])
-        if not requirement['ID'] in parent_children_id:
+        if not requirement[fields.ID] in parent_children_id:
             return True
     return False
 

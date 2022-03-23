@@ -5,6 +5,8 @@ from typing import Dict
 from typing import Iterable
 from typing import List
 
+import asciireqs.fields as fields
+
 Requirement = Dict[str, str]
 Requirements = Dict[str, Requirement]
 
@@ -36,7 +38,7 @@ class ReqDocument:
         return self._reqs
 
     def add_req(self, requirement: Requirement) -> None:
-        req_id = requirement['ID']
+        req_id = requirement[fields.ID]
         assert req_id
         self._reqs[req_id] = requirement
 
