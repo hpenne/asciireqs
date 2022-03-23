@@ -6,6 +6,7 @@ import sys
 
 from asciireqs.docparser import read_and_parse_project
 from asciireqs.reporting import generate_report_line, post_process_hierarchically
+from asciireqs.reporting import line_numbers_for_requirements
 
 
 # ToDo: Section and line numbers in requirements attributes
@@ -31,7 +32,7 @@ def main() -> None:
         with open(args.report_template, 'r') as template_file:
             with open(output_path, 'w') as report_file:
                 for _, line in generate_report_line(enumerate(template_file, start=1), project,
-                                                    project.requirements):
+                                                    project.requirements, {}):
                     report_file.write(line)
 
 

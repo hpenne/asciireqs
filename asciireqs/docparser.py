@@ -59,6 +59,18 @@ def get_table(lines: Iterable[Tuple[int, str]]) -> Tuple[Optional[Row], Optional
     attributes = re.compile(r'\[\w+=.+]')
     column_merge = re.compile(r'(\d+)\+')
     for line_no, line in lines:
+        if line.startswith('[cols'):
+            # This is crude, but it usually works:
+            num_widths = len(line.split(','))
+            if num_widths >= 2:
+                num_columns = num_widths
+            else:
+                eq_pos = line.find('=')
+                bracket_pos = line.find(']')
+                if 0 <= eq_pos < bracket_pos:
+                    num_str = line[eq_pos + 1: bracket_pos - 1]
+                    num_columns = int(num_str)
+                num_columns = int()
         if in_table:
             if line.rstrip() == '|===':
                 if len(table_rows[0]) != len(table_rows[-1]):
@@ -72,9 +84,6 @@ def get_table(lines: Iterable[Tuple[int, str]]) -> Tuple[Optional[Row], Optional
                     table_rows = []
                 continue
             cells: Cells = [Cell(cell.strip(), Location(line_no)) for cell in line.split('|')]
-            if len(cells) < 2:
-                print(f'Error on line {line_no}, not table: {line}')
-                return None, None
             matches = column_merge.search(cells[0].data) if cells[0] else None
             if matches:
                 # The line starts with a cell merge specifier,
@@ -82,6 +91,7 @@ def get_table(lines: Iterable[Tuple[int, str]]) -> Tuple[Optional[Row], Optional
                 additional_cells: int = int(matches.groups()[0]) - 1
                 cells = cells + additional_cells * [empty_cell()]
             if not num_columns:
+                # If the number of columns has not been set, then this must be the heading row:
                 num_columns = len(cells) - 1
             append_cells(table_rows, num_columns,
                          cells[1:])  # Drop the initial non-cell element we got from split()
@@ -104,7 +114,8 @@ def reqs_from_req_table(heading: Row, table_rows: Table) -> Iterable[Requirement
 
 
 def req_from_single_req_table(table_lines: Table) -> Optional[Requirement]:
-    req = {fields.ID: table_lines[0][0]}  # First cell should be requirement ID
+    # First cell should be requirement ID
+    req = {fields.ID: table_lines[0][0].data, fields.LINE_NO: table_lines[0][0].location.line}
     for cell in sum(table_lines, [])[1:]:
         if cell:
             parts = [part.strip() for part in cell.data.split(':')]
@@ -113,8 +124,9 @@ def req_from_single_req_table(table_lines: Table) -> Optional[Requirement]:
                     if not cell.empty():
                         print(("Error in single req. table: Second non-property/value pair found"
                                f"(only one allowed): {cell}"))
-                    return None
-                req['Text'] = cell
+                        return None
+                else:
+                    req['Text'] = parts[0]
             else:
                 if parts[0]:
                     req[parts[0]] = parts[1]

@@ -48,19 +48,20 @@ def test_table_missing_element() -> None:
     assert not rows
 
 
-def test_table_merged_cells() -> None:
-    lines = enumerate(['|===', '| A | B | C', '3+| Merged', '|==='], start=1)
-    heading, rows = get_table(lines)
-    assert rows
-    assert len(rows) == 2
-    assert rows[0] == row([('A', 2), ('B', 2), ('C', 2)])
-    assert rows[1] == row([('Merged', 3), empty(), empty()])
-
-
 def test_table_cols_inside() -> None:
     lines = enumerate(['|===', '[cols="1,1,1"]', '| A | B | C |', '|==='], start=1)
     heading, rows = get_table(lines)
     assert not rows
+
+
+def test_table_merged_cells() -> None:
+    lines = enumerate(['[cols="1,1,1"]', '|===', '| A', '| B', '| C', '3+| Merged', '|==='],
+                      start=1)
+    heading, rows = get_table(lines)
+    assert rows
+    assert len(rows) == 2
+    assert rows[0] == row([('A', 3), ('B', 4), ('C', 5)])
+    assert rows[1] == row([('Merged', 6), empty(), empty()])
 
 
 def test_reqs_from_reqtable() -> None:
@@ -70,5 +71,5 @@ def test_reqs_from_reqtable() -> None:
     reqs = list(reqs_from_req_table(heading, rows))
     assert reqs
     assert len(reqs) == 2
-    assert reqs[0] == {'1': 'A', '2': 'B', '3': 'C', '_line': 3}
-    assert reqs[1] == {'1': 'D', '2': 'E', '3': 'F', '_line': 4}
+    assert reqs[0] == {'1': 'A', '2': 'B', '3': 'C', fields.LINE_NO: 3}
+    assert reqs[1] == {'1': 'D', '2': 'E', '3': 'F', fields.LINE_NO: 4}

@@ -1,10 +1,11 @@
 """reporting - functions to output tables etc. to asciidoc reports"""
 
 import os
-from typing import Iterable, List, Optional, Tuple
+from typing import Dict, Iterable, List, Optional, Tuple
+
+import asciireqs.fields as fields
 from asciireqs.docparser import Project
 from asciireqs.reqdocument import ReqDocument, Requirement, Requirements
-import asciireqs.fields as fields
 
 
 def get_spec_hierarchy(doc: ReqDocument, preamble: str) -> List[str]:
@@ -88,8 +89,17 @@ def get_table(project: Project, requirements: Requirements, fields: List[str],
     return table
 
 
-def generate_report_line(input_lines: Iterable[Tuple[int, str]], project: Project,
-                         requirements: Requirements) -> Iterable[Tuple[int, str]]:
+def line_numbers_for_requirements(requirements: Requirements) -> Dict[int, str]:
+    lines: Dict[int, str] = {}
+    for req_id, attributes in requirements.items():
+        lines[attributes[fields.LINE_NO]] = req_id
+    return lines
+
+
+def generate_report_line(input_lines: Iterable[Tuple[int, str]],
+                         project: Project,
+                         requirements: Requirements,
+                         req_lines: Dict[int, str]) -> Iterable[Tuple[int, str]]:
     for line_no, input_line in input_lines:
         stripped_line: str = input_line.strip()
         if stripped_line == '`asciireq-hierarchy`':
@@ -103,16 +113,23 @@ def generate_report_line(input_lines: Iterable[Tuple[int, str]], project: Projec
             for line in get_table(project, requirements, field_names, filter_expression):
                 yield line_no, line
         else:
+            if line_no in req_lines:
+                # This line contains a requirement definition
+                req_id = req_lines[line_no]
+                req_begin = input_line.find(req_id)
+                req_end = req_begin + len(req_id)
+                input_line = input_line[:req_begin] + '[[' + input_line[req_begin:req_end] + ']]' + input_line[req_begin:]
             yield line_no, input_line
 
 
 def post_process_hierarchically(project: Project, document: ReqDocument, output_dir: str):
+    requirement_lines = line_numbers_for_requirements(document.get_reqs())
     _, output_file_name = os.path.split(document.get_name())
     output_path = os.path.join(output_dir, output_file_name)
     with open(document.get_name(), 'r') as input_file:
         with open(output_path, 'w') as output_file:
             for line_no, line in generate_report_line(enumerate(input_file, start=1), project,
-                                                      document.get_reqs()):
+                                                      document.get_reqs(), requirement_lines):
                 output_file.write(line)
     for sub_doc in document.get_children():
         post_process_hierarchically(project, sub_doc, output_dir)
