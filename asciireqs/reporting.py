@@ -114,11 +114,12 @@ def generate_report_line(input_lines: Iterable[Tuple[int, str]],
                 yield line_no, line
         else:
             if line_no in req_lines:
-                # This line contains a requirement definition
+                # This line contains a requirement definition which we want to make into an anchor:
                 req_id = req_lines[line_no]
                 req_begin = input_line.find(req_id)
                 req_end = req_begin + len(req_id)
-                input_line = input_line[:req_begin] + '[[' + input_line[req_begin:req_end] + ']]' + input_line[req_begin:]
+                input_line = input_line[:req_begin] + '[[' + input_line[req_begin:req_end] + ']]' \
+                           + input_line[req_begin:]
             yield line_no, input_line
 
 

@@ -50,7 +50,6 @@ def append_cells(table_rows: Table, num_columns: int, cells: Cells) -> None:
                 table_rows[-1].append(cell)
 
 
-# ToDo: Use the cols attribute(?) to get the number of columns
 def get_table(lines: Iterable[Tuple[int, str]]) -> Tuple[Optional[Row], Optional[Table]]:
     in_table: bool = False
     num_columns: Optional[int] = None
@@ -68,9 +67,11 @@ def get_table(lines: Iterable[Tuple[int, str]]) -> Tuple[Optional[Row], Optional
                 eq_pos = line.find('=')
                 bracket_pos = line.find(']')
                 if 0 <= eq_pos < bracket_pos:
-                    num_str = line[eq_pos + 1: bracket_pos - 1]
+                    num_str = line[eq_pos + 1: bracket_pos]
                     num_columns = int(num_str)
-                num_columns = int()
+                else:
+                    print(f'Error on line {line_no}, failed to parse number of columns: {line}')
+                    return None, None
         if in_table:
             if line.rstrip() == '|===':
                 if len(table_rows[0]) != len(table_rows[-1]):

@@ -54,10 +54,22 @@ def test_table_cols_inside() -> None:
     assert not rows
 
 
-def test_table_merged_cells() -> None:
+def test_single_req_table_with_column_widths() -> None:
     lines = enumerate(['[cols="1,1,1"]', '|===', '| A', '| B', '| C', '3+| Merged', '|==='],
                       start=1)
     heading, rows = get_table(lines)
+    assert not heading
+    assert rows
+    assert len(rows) == 2
+    assert rows[0] == row([('A', 3), ('B', 4), ('C', 5)])
+    assert rows[1] == row([('Merged', 6), empty(), empty()])
+
+
+def test_single_req_table_with_column_count() -> None:
+    lines = enumerate(['[cols=3]', '|===', '| A', '| B', '| C', '3+| Merged', '|==='],
+                      start=1)
+    heading, rows = get_table(lines)
+    assert not heading
     assert rows
     assert len(rows) == 2
     assert rows[0] == row([('A', 3), ('B', 4), ('C', 5)])
@@ -66,10 +78,19 @@ def test_table_merged_cells() -> None:
 
 def test_reqs_from_reqtable() -> None:
     heading = row([('1', 2), ('2', 2), ('3', 2)])
-    rows = [row([('A', 3), ('B', 3), ('C', 3)]),
-            row([('D', 4), ('E', 4), ('F', 4)])]
+    rows = [row([('A', 3), ('B', 3), ('C', 3)]), row([('D', 4), ('E', 4), ('F', 4)])]
     reqs = list(reqs_from_req_table(heading, rows))
     assert reqs
     assert len(reqs) == 2
     assert reqs[0] == {'1': 'A', '2': 'B', '3': 'C', fields.LINE_NO: 3}
     assert reqs[1] == {'1': 'D', '2': 'E', '3': 'F', fields.LINE_NO: 4}
+
+
+def test_req_from_single_req_table() -> None:
+    rows = [row([('ID-1', 3), ('Parent: ID-2', 3), ('Child: ID-3', 3)]),
+            row([('Text', 4), empty(), empty()])]
+    reqs = req_from_single_req_table(rows)
+    assert reqs
+    assert len(reqs) == 5
+    assert reqs == {fields.ID: 'ID-1', 'Parent': 'ID-2', 'Child': 'ID-3', 'Text': 'Text',
+                    fields.LINE_NO: 3}
