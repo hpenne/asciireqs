@@ -1,6 +1,8 @@
 = User requirements for requirements management SW
 :toc: macro
 :toclevels: 4
+:sectnums:
+:sectnumlevels: 3
 :disclosure: Internal
 :req-children: req-tool-sw-reqs.adoc
 :req-prefix: UR-RMS-REQ-

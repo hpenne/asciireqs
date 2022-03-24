@@ -1,12 +1,13 @@
 = User requirements for requirements management SW
 :toc: macro
 :toclevels: 4
+:sectnums:
+:sectnumlevels: 3
 :disclosure: Internal
 :req-prefix: SW-RMS-REQ-
 
 This is a page after the cover, where approval and history will go.
 
-Test link: <<SW-RMS-REQ-032>>
 <<<
 
 toc::[]

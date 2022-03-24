@@ -1,6 +1,7 @@
 """reporting - functions to output tables etc. to asciidoc reports"""
 
 import os
+import re
 from typing import Dict, Iterable, List, Optional, Tuple
 
 import asciireqs.fields as fields
@@ -96,6 +97,13 @@ def line_numbers_for_requirements(requirements: Requirements) -> Dict[int, str]:
     return lines
 
 
+def insert_requirement_links(line: str, doc: ReqDocument) -> str:
+    line = re.sub(f'({doc.get_req_prefix()}\d+)', f'xref:{doc.get_name()}#\\1[\\1]', line)
+    for child_doc in doc.get_children():
+        line = insert_requirement_links(line, child_doc)
+    return line
+
+
 def generate_report_line(input_lines: Iterable[Tuple[int, str]],
                          project: Project,
                          requirements: Requirements,
@@ -118,9 +126,12 @@ def generate_report_line(input_lines: Iterable[Tuple[int, str]],
                 req_id = req_lines[line_no]
                 req_begin = input_line.find(req_id)
                 req_end = req_begin + len(req_id)
-                input_line = input_line[:req_begin] + '[[' + input_line[req_begin:req_end] + ']]' \
-                           + input_line[req_begin:]
-            yield line_no, input_line
+                input_line = input_line[:req_begin] + '[[' + input_line[req_begin:req_end] + ']]'\
+                           + input_line[req_begin:req_end]\
+                           + insert_requirement_links(input_line[req_end:], project.root_document)
+                yield line_no, input_line
+            else:
+                yield line_no, insert_requirement_links(input_line, project.root_document)
 
 
 def post_process_hierarchically(project: Project, document: ReqDocument, output_dir: str):
