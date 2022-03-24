@@ -94,3 +94,14 @@ def test_req_from_single_req_table() -> None:
     assert len(reqs) == 5
     assert reqs == {fields.ID: 'ID-1', 'Parent': 'ID-2', 'Child': 'ID-3', 'Text': 'Text',
                     fields.LINE_NO: 3}
+
+
+def test_req_from_single_req_table_with_three_rows() -> None:
+    rows = [row([('ID-1', 3), ('Parent: ID-2', 3)]),
+            row([('Tags: V.1', 3), ('Child: ID-3', 3)]),
+            row([('Text', 4), empty(), empty()])]
+    reqs = req_from_single_req_table(rows)
+    assert reqs
+    assert len(reqs) == 6
+    assert reqs == {fields.ID: 'ID-1', 'Parent': 'ID-2', 'Child': 'ID-3', 'Tags': 'V.1',
+                    'Text': 'Text', fields.LINE_NO: 3}

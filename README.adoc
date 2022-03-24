@@ -114,6 +114,8 @@ Notice how the asciidoc "cols" attribute is used here to define the number of co
 Also notice that the first cell is the requirement ID implicitly, while the other cells use a "property: value" syntax to define requirement property names and values (unlike a normal table where the column heading defines the property names).
 The exception is the last merged cell that defines the requirement Text property.
 
+You can use as many rows of requirement properties as necessary, but the last row must be a single merged cell containing the requirement text.
+
 ==== Requirement properties
 
 The requirements consist of named properties with values.
@@ -163,7 +165,7 @@ asciireq -o outputdir my-spec.adoc
 This will make asciireq parse my-spec.adoc and all child documents (recursively).
 Parsing is followed by post-processing.
 This writes each document to the output directory ("outputdir" in the example).
-These documents have all requirements turned into hyperlinks, to make the specification easy to navigate.
+These documents have all requirements turned into hyperlinks which also work across documents, to make the specification hierarchy easy to navigate.
 
 Report generation macros are also processed, to put extra report data in the output documents.
 
