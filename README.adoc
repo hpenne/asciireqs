@@ -184,7 +184,7 @@ Putting the following in a document will make ascireqs replace it with a require
 
 [source, asciidoc]
 ----
-`asciireq-table: ID, Text, Tags; req["Tags"].find("V.1") >= 0`
+`asciireq-table: ID, Text, Tags; has_element(req["Tags"], "Rel-1")`
 ----
 
 The list after the colon is a list of the column headings to put in the table (each heading is a requirement property name).
@@ -193,6 +193,15 @@ The list of property names can be followed by a semicolon and a filter expressio
 The filter expression is a Python expression operating on a requirement object.
 The requirement object is a variable named `req` and is a dictionary of property names and values (of type `str`).
 If the expression evaluates to true then the requirement will be in the table.
-In the example, the filter picks out all requirements where the "Tags" property contains the string "V.1".
+
+In the example, the filter uses the helper function `has_element` to pick out all requirements where the "Tags" property contains the string "V.1".
+
+The following helper functions are defined:
+
+* has_element: This takes a requirement property value as the first argument and a target string as the second, and returns true if the target string is found in the property value.
+
+* link_error: This takes the requirement object as a parameter and returns true if a parent-child link is defined in one direction but not both.
+This is useful to generate tables of requirements with broken/inconsistent links.
+
 
 If the filter expression is omitted then all the requirements in the current document are put in the table.
