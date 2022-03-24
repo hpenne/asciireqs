@@ -104,6 +104,14 @@ def insert_requirement_links(line: str, doc: ReqDocument) -> str:
     return line
 
 
+def insert_anchor(line: str, req_id: str, root_document: ReqDocument) -> str:
+    req_begin = line.find(req_id)
+    req_end = req_begin + len(req_id)
+    return line[:req_begin] + '[[' + line[req_begin:req_end] + ']]' \
+           + line[req_begin:req_end] \
+           + insert_requirement_links(line[req_end:], root_document)
+
+
 def generate_report_line(input_lines: Iterable[Tuple[int, str]],
                          project: Project,
                          requirements: Requirements,
@@ -123,13 +131,7 @@ def generate_report_line(input_lines: Iterable[Tuple[int, str]],
         else:
             if line_no in req_lines:
                 # This line contains a requirement definition which we want to make into an anchor:
-                req_id = req_lines[line_no]
-                req_begin = input_line.find(req_id)
-                req_end = req_begin + len(req_id)
-                input_line = input_line[:req_begin] + '[[' + input_line[req_begin:req_end] + ']]'\
-                           + input_line[req_begin:req_end]\
-                           + insert_requirement_links(input_line[req_end:], project.root_document)
-                yield line_no, input_line
+                yield line_no, insert_anchor(input_line, req_lines[line_no], project.root_document)
             else:
                 yield line_no, insert_requirement_links(input_line, project.root_document)
 
