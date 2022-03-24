@@ -58,7 +58,7 @@ def get_table(lines: Iterable[Tuple[int, str]]) -> Tuple[Optional[Row], Optional
     attributes = re.compile(r'\[\w+=.+]')
     column_merge = re.compile(r'(\d+)\+')
     for line_no, line in lines:
-        if line.startswith('[cols'):
+        if line.startswith('[cols'):  # ToDo: At start only
             # This is crude, but it usually works:
             num_widths = len(line.split(','))
             if num_widths >= 2:
@@ -164,19 +164,18 @@ def parse_doc(lines: Iterable[Tuple[int, str]]) -> ReqDocument:
         else:
             attribute_value = get_attribute(text, 'req-children')
             if attribute_value:
-                doc.set_child_doc_files(
-                    [file_name.strip() for file_name in attribute_value.split(',')])
+                doc.child_doc_files = [file_name.strip() for file_name in attribute_value.split(',')]
             attribute_value = get_attribute(text, 'req-prefix')
             if attribute_value:
-                doc.set_req_prefix(attribute_value)
+                doc.req_prefix = attribute_value
     return doc
 
 
 def read_and_parse(file_name: str) -> ReqDocument:
     with open(file_name, 'r') as file:
         doc = parse_doc(enumerate(file, start=1))
-        doc.set_name(file_name)
-        for req in doc.get_reqs().values():
+        doc.name = file_name
+        for req in doc.reqs.values():
             print(req)
         return doc
 
@@ -184,9 +183,9 @@ def read_and_parse(file_name: str) -> ReqDocument:
 def read_and_parse_project(file_path: str) -> Project:
     path, _ = os.path.split(file_path)
     doc = read_and_parse(file_path)
-    requirements = copy(doc.get_reqs())
-    for sub_file_name in doc.get_child_doc_files():
+    requirements = copy(doc.reqs)
+    for sub_file_name in doc.child_doc_files:
         child_doc = read_and_parse(os.path.join(path, sub_file_name))
         doc.add_child_doc(child_doc)
-        requirements |= child_doc.get_reqs()  # ToDo: Check for duplicates
+        requirements |= child_doc.reqs  # ToDo: Check for duplicates
     return Project(doc, requirements)

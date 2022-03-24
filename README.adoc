@@ -13,6 +13,8 @@ The parser supports requirement document hierarchies, and can find and report in
 
 This allows complicated sets of product requirements to be written in AsciiDoc.
 
+AsciiReqs is to some degree inspired by Sphinxs-Needs
+
 == Status
 
 This is a prototype that I wrote out of frustration with an ancient and horrible (but common) Requirement Management System.  It was written to freshen up my Python skills.  It has some tests, but needs more and better error handling and more unit tests.
@@ -21,5 +23,176 @@ Still, it is in a workable state and the current functionality is at a level whe
 
 == Features
 
+AsciiReqs can:
+
+* Find requirements in tables with one requirement per row
+* Find requirements in tables where the table contains a single requirement over several lines
+* Find and parse sub specifications using AsciiDoc attributes, to parse a hierarchy of specifications
+* Identify requirement links to parent and child requirements
+* Post process requirement documents and insert AsciiDoc anchors and cross-links for the requirements, which turn into hyperlinks in the generated html.
+* Detect and execute inline "macros" that generate tables of requirements in the post processed document, based on arbitrary user-specified filters.
+* Export to CVS
+
 == How does it work?
 
+Write your requirement specification in asciidoc.
+Put the requirements in tables.
+
+=== Defining requirements
+
+==== Tables with multiple requirements
+
+The simplest way is to put them in table with a heading row defining the requirement fields, and where each normal row defines a requirement.
+The line immediately before the table is marked with an asciidoc "role" (".reqtable") to mark the table as an asciireqs requirement table:
+
+[source, asciidoc]
+----
+[.reqs]
+[cols="2,4,1,2"]
+|===
+|ID |Text |Tags |Child
+
+|UR-RMS-011
+|This is the text defining the first requirement
+|V.1
+|SW-RMS-REQ-011
+
+|UR-RMS-012
+|This is the text defining the second requirement
+|V.1.1
+|
+|===
+----
+
+This will be rendered by asciidoc as:
+[cols="2,4,1,2"]
+|===
+|ID |Text |Tags |Child
+
+|UR-RMS-011
+|This is the text defining the first requirement
+|V.1
+|SW-RMS-REQ-011
+
+|UR-RMS-012
+|This is the text defining the second requirement
+|V.1.1
+|
+|===
+
+Asciireqs will parse this table and pick up both the requirements and them to the project model, under the current document.
+It will do so for all the tables marked with the ".reqs" role.
+
+==== Tables (forms) with a single requirement
+
+If requirements have more fields than will easily fit in a normal table then you can also use a table as a form that defines a single requirement (note that the role here is ".req" instead of ".reqs").
+
+[source, asciidoc]
+----
+[.req]
+[cols="1,1,1"]
+|===
+|UR-RMS-021
+|Child: SW-RMS-021
+|Tags: V.1
+3+|This is the text that defines the requirement
+|===
+----
+
+This renders as:
+
+[cols=3]
+|===
+|UR-RMS-021
+|Child: SW-RMS-021
+|Tags: V.1
+3+|This is the text that defines the requirement.
+|===
+
+Notice how the asciidoc "cols" attribute is used here to define the number of columns when the table has not heading row.
+
+Also notice that the first cell is the requirement ID implicitly, while the other cells use a "property: value" syntax to define requirement property names and values (unlike a normal table where the column heading define the property names).
+The exception is the last merged cell that defines the requirement text.
+
+==== Requirement fields
+
+The requirements consist of named properties with values.
+The following property names are treated specially by asciireqs:
+
+* ID: The requirement identifier
+* Child: The value is interpreted as a comma separated list of requirement identifiers for child requirements in a sub specification (links from a high level requirement to requirement further down in the specification hierarchy)
+* Parent: The value is interpreted as a comma separated list of requirement identifiers linking up to parent requirements higher in the hierarchy)
+
+==== Child specifications
+
+You can use a document attribute named `req-children` to define child specifications to parse.
+The value is a comma separated list of child requirement documents.
+
+Adding the following line to the attribute section at the start of your document will define child-reqs.adoc and child-reqs-2.adoc as a child requirement documents:
+
+[source, asciidoc]
+----
+:req-children: child-reqs.adoc, child-reqs-2.adoc
+----
+
+Asciireqs will parse these documents as well, as child documents in the specification hierarchy.
+
+==== Other document attributes
+
+You also need to define an attribute to tell asciireqs the prefix string for your requirement IDs.
+The following defines "SW-REQ-" as the prefix for the current document's requirements (meaning that all requirement IDs are "SW-REQ-" followed by one or more digits):
+
+[source, asciidoc]
+----
+:req-prefix: SW-REQ-
+----
+
+This attribute is necessary in order to identify the requirement IDs and insert cross-links when post-processing the documents.
+
+=== Running asciireqs
+
+Invoke asciireq with the name of the top level requirement document and an option to specify the output directory:
+
+[source, bash]
+----
+asciireq -o outputdir my-spec.adoc
+----
+
+This will make asciireq parse my-spec.adoc and all child documents (recursively).
+Parsing is followed by post-processing.
+This writes each document to the output directory ("outputdir" in the example).
+These documents have all requirements turned into hyperlinks, to make the specification easy to navigate.
+
+Report generation macros are also processed, to put extra report data in the output documents.
+
+=== Report generation macros
+
+There are currently two "macros" that will be expanded by the post processing done by asciireqs:
+
+==== The document hierarchy macro
+
+Putting the following in a document will make ascireqs replace it with a hierarchical list that defines the document hierarchy (a figure generated from inline PlantUML would have been even nicer, of course):
+
+[source, asciidoc]
+----
+`asciireq-hierarchy`
+----
+
+==== The requirement table macro
+
+Putting the following in a document will make ascireqs replace it with a requirement table:
+
+[source, asciidoc]
+----
+`asciireq-table: ID, Text, Tags; req["Tags"].find("V.1") >= 0`
+----
+
+The list after the colon is a list of the column headings to put in the table (each heading is a requirement property name).
+The list of property names can be followed by a semicolon and a filter expression.
+
+The filter expression is a Python expression operating on a requirement object.
+The requirement object is a variable named `req` and is a dictionary of property names and values (of type `str`).
+If the expression evaluates to true then the requirement will be in the table.
+In the example, the filter picks out all requirements where the "Tags" property contains the string "V.1".
+
+If the filter expression is omitted then all the requirements in the current document are put in the table.

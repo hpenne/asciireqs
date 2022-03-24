@@ -10,11 +10,11 @@ def doc1_reqs() -> Requirements:
 
 def docs_with_req_prefix() -> ReqDocument:
     doc = ReqDocument()
-    doc.set_req_prefix('UR-REQ-')
-    doc.set_name('ur-reqs.adoc')
+    doc.req_prefix = 'UR-REQ-'
+    doc.name = 'ur-reqs.adoc'
     child_doc = ReqDocument()
-    child_doc.set_req_prefix('SW-REQ-')
-    child_doc.set_name('sw-reqs.adoc')
+    child_doc.req_prefix = 'SW-REQ-'
+    child_doc.name = 'sw-reqs.adoc'
     doc.add_child_doc(child_doc)
     return doc
 

@@ -11,8 +11,8 @@ from asciireqs.reqdocument import ReqDocument, Requirement, Requirements
 
 def get_spec_hierarchy(doc: ReqDocument, preamble: str) -> List[str]:
     preamble = preamble + '*'
-    text: List[str] = [f'{preamble} {doc.get_name()}\n']
-    for sub_doc in doc.get_children():
+    text: List[str] = [f'{preamble} {doc.name}\n']
+    for sub_doc in doc.child_docs:
         text += get_spec_hierarchy(sub_doc, preamble)
     return text
 
@@ -98,8 +98,8 @@ def line_numbers_for_requirements(requirements: Requirements) -> Dict[int, str]:
 
 
 def insert_requirement_links(line: str, doc: ReqDocument) -> str:
-    line = re.sub(f'({doc.get_req_prefix()}\d+)', f'xref:{doc.get_name()}#\\1[\\1]', line)
-    for child_doc in doc.get_children():
+    line = re.sub(f'({doc.req_prefix}\d+)', f'xref:{doc.name}#\\1[\\1]', line)
+    for child_doc in doc.child_docs:
         line = insert_requirement_links(line, child_doc)
     return line
 
@@ -137,15 +137,15 @@ def generate_report_line(input_lines: Iterable[Tuple[int, str]],
 
 
 def post_process_hierarchically(project: Project, document: ReqDocument, output_dir: str):
-    requirement_lines = line_numbers_for_requirements(document.get_reqs())
-    _, output_file_name = os.path.split(document.get_name())
+    requirement_lines = line_numbers_for_requirements(document.reqs)
+    _, output_file_name = os.path.split(document.name)
     output_path = os.path.join(output_dir, output_file_name)
-    with open(document.get_name(), 'r') as input_file:
+    with open(document.name, 'r') as input_file:
         with open(output_path, 'w') as output_file:
             for line_no, line in generate_report_line(enumerate(input_file, start=1), project,
-                                                      document.get_reqs(), requirement_lines):
+                                                      document.reqs, requirement_lines):
                 output_file.write(line)
-    for sub_doc in document.get_children():
+    for sub_doc in document.child_docs:
         post_process_hierarchically(project, sub_doc, output_dir)
 
 # ToDo: Tests
