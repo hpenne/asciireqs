@@ -43,7 +43,7 @@ Put the requirements in tables.
 ==== Tables with multiple requirements
 
 The simplest way is to put them in table with a heading row defining the requirement fields, and where each normal row defines a requirement.
-The line immediately before the table is marked with an asciidoc "role" (".reqtable") to mark the table as an asciireqs requirement table:
+The line immediately before the table is marked with an asciidoc "role" (.reqs) to mark the table as an asciireqs requirement table:
 
 [source, asciidoc]
 ----
@@ -80,12 +80,12 @@ This will be rendered by asciidoc as:
 |
 |===
 
-Asciireqs will parse this table and pick up both the requirements and them to the project model, under the current document.
+Asciireqs will parse this table and pick up all the requirements and add them to the project model, under the current document.
 It will do so for all the tables marked with the ".reqs" role.
 
 ==== Tables (forms) with a single requirement
 
-If requirements have more fields than will easily fit in a normal table then you can also use a table as a form that defines a single requirement (note that the role here is ".req" instead of ".reqs").
+If requirements have more fields than will easily fit in a normal table then you can also use a table as a form that defines a single requirement (note that the role must be ".req" instead of ".reqs").
 
 [source, asciidoc]
 ----
@@ -109,26 +109,28 @@ This renders as:
 3+|This is the text that defines the requirement.
 |===
 
-Notice how the asciidoc "cols" attribute is used here to define the number of columns when the table has not heading row.
+Notice how the asciidoc "cols" attribute is used here to define the number of columns when the table has no heading row.
 
-Also notice that the first cell is the requirement ID implicitly, while the other cells use a "property: value" syntax to define requirement property names and values (unlike a normal table where the column heading define the property names).
-The exception is the last merged cell that defines the requirement text.
+Also notice that the first cell is the requirement ID implicitly, while the other cells use a "property: value" syntax to define requirement property names and values (unlike a normal table where the column heading defines the property names).
+The exception is the last merged cell that defines the requirement Text property.
 
-==== Requirement fields
+==== Requirement properties
 
 The requirements consist of named properties with values.
 The following property names are treated specially by asciireqs:
 
 * ID: The requirement identifier
 * Child: The value is interpreted as a comma separated list of requirement identifiers for child requirements in a sub specification (links from a high level requirement to requirement further down in the specification hierarchy)
-* Parent: The value is interpreted as a comma separated list of requirement identifiers linking up to parent requirements higher in the hierarchy)
+* Parent: The value is interpreted as a comma separated list of requirement identifiers linking up to parent requirements higher in the hierarchy.
 
 ==== Child specifications
 
 You can use a document attribute named `req-children` to define child specifications to parse.
 The value is a comma separated list of child requirement documents.
 
-Adding the following line to the attribute section at the start of your document will define child-reqs.adoc and child-reqs-2.adoc as a child requirement documents:
+Adding the following line to the attribute section at the start of your document will define `child-reqs.adoc` and `child-reqs-2.adoc` as a child requirement documents:
+
+Note that the child documents must reside in the working folder (use of paths is not supported).
 
 [source, asciidoc]
 ----
@@ -196,7 +198,7 @@ If the expression evaluates to true then the requirement will be in the table.
 
 In the example, the filter uses the helper function `has_element` to pick out all requirements where the "Tags" property contains the string "V.1".
 
-The following helper functions are defined:
+The following helper functions are defined (comparisons can also be used):
 
 * has_element: This takes a requirement property value as the first argument and a target string as the second, and returns true if the target string is found in the property value.
 
