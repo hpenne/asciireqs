@@ -59,6 +59,10 @@ def test_has_element() -> None:
     assert not has_element(s, 'Two,Three')
 
 
+def test_split_req_list_empty() -> None:
+    assert not split_req_list('')
+
+
 def test_split_req_list() -> None:
     assert split_req_list('One, Two,Three') == ['One', 'Two', 'Three']
 

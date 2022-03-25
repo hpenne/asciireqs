@@ -25,7 +25,7 @@ def has_element(field_text: str, sub_str: str) -> bool:
 
 
 def split_req_list(req_list: str) -> List[str]:
-    return [req.strip() for req in req_list.split(',')]
+    return [req.strip() for req in req_list.split(',') if req]
 
 
 def missing_link_from_parent(requirement: Requirement, project: Project) -> bool:
