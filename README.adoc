@@ -204,7 +204,7 @@ The following helper functions are defined (comparisons can also be used):
 
 * has_element: This takes a requirement property value as the first argument and a target string as the second, and returns true if the target string is found in the property value.
 
-* link_error: This takes the requirement object as a parameter and returns true if a parent-child link is defined in one direction but not both.
+* link_error: This takes the requirement object as a parameter and returns true if the requirement has a link to one or more parents, where the parent has no link back to the requirement.
 This is useful to generate tables of requirements with broken/inconsistent links.
 
 

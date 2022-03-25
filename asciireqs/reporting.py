@@ -18,14 +18,14 @@ def get_spec_hierarchy(doc: ReqDocument, preamble: str) -> List[str]:
 
 
 def has_element(field_text: str, sub_str: str) -> bool:
-    return field_text.find(sub_str) >= 0
+    for element in field_text.split(','):
+        if element.strip() == sub_str:
+            return True
+    return False
 
 
 def split_req_list(req_list: str) -> List[str]:
-    reqs: List[str] = []
-    for req in req_list.split(','):
-        reqs.append(req.strip())
-    return reqs
+    return [req.strip() for req in req_list.split(',')]
 
 
 def missing_link_from_parent(requirement: Requirement, project: Project) -> bool:
