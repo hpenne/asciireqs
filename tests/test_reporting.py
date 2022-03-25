@@ -61,3 +61,49 @@ def test_has_element() -> None:
 
 def test_split_req_list() -> None:
     assert split_req_list('One, Two,Three') == ['One', 'Two', 'Three']
+
+
+def test_missing_link_from_parent_link_ok() -> None:
+    ur = ReqDocument()
+    ur.reqs['UR-1'] = {'ID': 'UR-1', 'Child': 'SR-1'}
+    sr = ReqDocument()
+    ur.child_docs = [sr]
+    sr1 = {'ID': 'SR-1', 'Parent': 'UR-1'}
+    sr.reqs['SR-1'] = sr1
+    project = Project(ur, ur.reqs | sr.reqs)
+    assert not missing_link_from_parent(sr1, project)
+
+
+def test_missing_link_from_parent_no_downlink() -> None:
+    ur = ReqDocument()
+    ur.reqs['UR-1'] = {'ID': 'UR-1', 'Child': 'SR-2'}
+    sr = ReqDocument()
+    ur.child_docs = [sr]
+    sr1 = {'ID': 'SR-1', 'Parent': 'UR-1'}
+    sr.reqs['SR-1'] = sr1
+    project = Project(ur, ur.reqs | sr.reqs)
+    assert missing_link_from_parent(sr1, project)
+
+
+def test_missing_link_from_parent_one_of_two_downlinks_ok() -> None:
+    ur = ReqDocument()
+    ur.reqs['UR-1'] = {'ID': 'UR-1', 'Child': 'SR-1'}
+    ur.reqs['UR-2'] = {'ID': 'UR-1', 'Child': 'SR-2'}
+    sr = ReqDocument()
+    ur.child_docs = [sr]
+    sr1 = {'ID': 'SR-1', 'Parent': 'UR-1, UR-2'}
+    sr.reqs['SR-1'] = sr1
+    project = Project(ur, ur.reqs | sr.reqs)
+    assert missing_link_from_parent(sr1, project)
+
+
+def test_missing_link_from_parent_two_of_two_downlinks_ok() -> None:
+    ur = ReqDocument()
+    ur.reqs['UR-1'] = {'ID': 'UR-1', 'Child': 'SR-1'}
+    ur.reqs['UR-2'] = {'ID': 'UR-2', 'Child': 'SR-1'}
+    sr = ReqDocument()
+    ur.child_docs = [sr]
+    sr1 = {'ID': 'SR-1', 'Parent': 'UR-1, UR-2'}
+    sr.reqs['SR-1'] = sr1
+    project = Project(ur, ur.reqs | sr.reqs)
+    assert not missing_link_from_parent(sr1, project)

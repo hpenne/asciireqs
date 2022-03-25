@@ -35,9 +35,6 @@ def missing_link_from_parent(requirement: Requirement, project: Project) -> bool
         parent_req = project.requirements[parent_id]
         if 'Child' not in parent_req:
             return True
-        parent_req = project.requirements[parent_id]
-        if 'Child' not in parent_req:
-            return True
         parent_children_id = split_req_list(parent_req['Child'])
         if not requirement[fields.ID] in parent_children_id:
             return True
