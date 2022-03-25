@@ -40,7 +40,7 @@ Table = List[Row]
 
 
 def append_cells(table_rows: Table, num_columns: int, cells: Cells) -> None:
-    if not table_rows:
+    if not table_rows and len(cells) > 0:
         table_rows.append(cells)
     else:
         for cell in cells:
@@ -48,6 +48,22 @@ def append_cells(table_rows: Table, num_columns: int, cells: Cells) -> None:
                 table_rows.append([cell])
             else:
                 table_rows[-1].append(cell)
+
+
+def get_cols_from_attribute(line: str, line_no: int) -> Optional[int]:
+    # This is crude, but it usually works:
+    num_widths = len(line.split(','))
+    if num_widths >= 2:
+        return num_widths
+    else:
+        eq_pos = line.find('=')
+        bracket_pos = line.find(']')
+        if 0 <= eq_pos < bracket_pos:
+            num_str = line[eq_pos + 1: bracket_pos]
+            return int(num_str)
+        else:
+            print(f'Error on line {line_no}, failed to parse number of columns: {line}')
+            return None
 
 
 def get_table(lines: Iterable[Tuple[int, str]]) -> Tuple[Optional[Row], Optional[Table]]:
@@ -58,20 +74,6 @@ def get_table(lines: Iterable[Tuple[int, str]]) -> Tuple[Optional[Row], Optional
     attributes = re.compile(r'\[\w+=.+]')
     column_merge = re.compile(r'(\d+)\+')
     for line_no, line in lines:
-        if line.startswith('[cols'):  # ToDo: At start only
-            # This is crude, but it usually works:
-            num_widths = len(line.split(','))
-            if num_widths >= 2:
-                num_columns = num_widths
-            else:
-                eq_pos = line.find('=')
-                bracket_pos = line.find(']')
-                if 0 <= eq_pos < bracket_pos:
-                    num_str = line[eq_pos + 1: bracket_pos]
-                    num_columns = int(num_str)
-                else:
-                    print(f'Error on line {line_no}, failed to parse number of columns: {line}')
-                    return None, None
         if in_table:
             if line.rstrip() == '|===':
                 if len(table_rows[0]) != len(table_rows[-1]):
@@ -89,14 +91,17 @@ def get_table(lines: Iterable[Tuple[int, str]]) -> Tuple[Optional[Row], Optional
             if matches:
                 # The line starts with a cell merge specifier,
                 # so generate None cells for the unused ones:
-                additional_cells: int = int(matches.groups()[0]) - 1
+                additional_cells = int(matches.groups()[0]) - 1
                 cells = cells + additional_cells * [empty_cell()]
-            if not num_columns:
+            # Drop the "cell" before the vertical bar (not a cell):
+            cells = cells[1:]
+            if not num_columns and len(cells) > 0:
                 # If the number of columns has not been set, then this must be the heading row:
-                num_columns = len(cells) - 1
-            append_cells(table_rows, num_columns,
-                         cells[1:])  # Drop the initial non-cell element we got from split()
+                num_columns = len(cells)
+            append_cells(table_rows, num_columns, cells)
         else:
+            if line.startswith('[cols'):
+                num_columns = get_cols_from_attribute(line, line_no)
             if line.rstrip() == '|===':
                 in_table = True
             elif not attributes.match(line):

@@ -10,5 +10,5 @@
 
 == Requirements with missing links from parent
 
-`asciireq-table: ID, Text, Tags; link_error(req)`
+`asciireq-table: ID, Text, Tags; link_error()`
 

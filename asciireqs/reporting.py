@@ -43,33 +43,25 @@ def missing_link_from_parent(requirement: Requirement, project: Project) -> bool
 
 def evaluate_requirement_against_filter(req: Requirement, project: Project,
                                         filter_expression: str) -> bool:
-    try:
-        def missing_down_link(requirement: Requirement) -> bool:
-            return missing_link_from_parent(requirement, project)
-
-        allowed_names = {'req': req, 'has_element': has_element, 'link_error': missing_down_link}
-        code = compile(filter_expression, "<string>", "eval")
-        for name in code.co_names:
-            if name not in allowed_names:
-                raise NameError(f"Use of {name} not allowed")
-        return eval(filter_expression, {"__builtins__": {}}, allowed_names) is True
-    except KeyError as _:
-        return False  # ToDo: Propagate, location
-    except NameError as exception:
-        print(
-            f'ERROR: Failed to evaluate filter expression: {exception}')  # ToDo: Propagate, location
-        return False
+    def link_error() -> bool:
+        return missing_link_from_parent(req, project)
+    allowed_names = {'req': req, 'has_element': has_element, 'link_error': link_error}
+    code = compile(filter_expression, "<string>", "eval")
+    for name in code.co_names:
+        if name not in allowed_names:
+            raise NameError(f"Use of {name} not allowed")
+    return eval(filter_expression, {"__builtins__": {}}, allowed_names) is True
 
 
 def table_line(req: Requirement, fields: List[str]) -> Optional[str]:
     line: str = ''
-    try:
-        for field in fields:
+    for field in fields:
+        if field in req:
             line += f'|{req[field]}\n'
-        line += '\n'
-        return line
-    except KeyError:
-        return None  # ToDo: Propagate, location
+        else:
+            line += '|\n'
+    line += '\n'
+    return line
 
 
 def get_table(project: Project, requirements: Requirements, fields: List[str],
@@ -78,13 +70,20 @@ def get_table(project: Project, requirements: Requirements, fields: List[str],
     for field in fields:
         table.append(f'|{field} ')
     table.append('\n\n')
-    for req in requirements.values():
-        if evaluate_requirement_against_filter(req, project, filter_expression):
-            line = table_line(req, fields)
-            if line:
-                table.append(line)
-    table.append('|===\n')
-    return table
+    try:
+        for req in requirements.values():
+            if evaluate_requirement_against_filter(req, project, filter_expression):
+                line = table_line(req, fields)
+                if line:
+                    table.append(line)
+        table.append('|===\n')
+        return table
+    except NameError as exception:
+        print(f'Name error in expression evaluation: {exception}')
+        return []
+    except KeyError as exception:
+        print(f'Property lookup error in expression evaluation: {exception}')
+        return []
 
 
 def line_numbers_for_requirements(requirements: Requirements) -> Dict[int, str]:
@@ -119,7 +118,6 @@ def generate_report_line(input_lines: Iterable[Tuple[int, str]],
             for line in get_spec_hierarchy(project.root_document, ''):
                 yield line_no, line
         elif stripped_line.startswith('`asciireq-table:') and stripped_line.endswith('`'):
-            # ToDo: Error handling
             field_name_list, filter_expression = [param.strip() for param in
                                                   stripped_line[16:-1].strip().split(';')]
             field_names = [name.strip() for name in field_name_list.strip().split(',')]
@@ -144,5 +142,3 @@ def post_process_hierarchically(project: Project, document: ReqDocument, output_
                 output_file.write(line)
     for sub_doc in document.child_docs:
         post_process_hierarchically(project, sub_doc, output_dir)
-
-# ToDo: Tests

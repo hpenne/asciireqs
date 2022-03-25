@@ -48,12 +48,6 @@ def test_table_missing_element() -> None:
     assert not rows
 
 
-def test_table_cols_inside() -> None:
-    lines = enumerate(['|===', '[cols="1,1,1"]', '| A | B | C |', '|==='], start=1)
-    heading, rows = get_table(lines)
-    assert not rows
-
-
 def test_single_req_table_with_column_widths() -> None:
     lines = enumerate(['[cols="1,1,1"]', '|===', '| A', '| B', '| C', '3+| Merged', '|==='],
                       start=1)
