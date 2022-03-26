@@ -207,5 +207,29 @@ The following helper functions are defined (comparisons can also be used):
 * link_error: This true if the requirement has a link to one or more parents, where the parent has no link back to the requirement.
 This is useful to generate tables of requirements with broken/inconsistent links.
 
-
 If the filter expression is omitted then all the requirements in the current document are put in the table.
+
+=== Test drive (for Linux)
+
+The `testdata` folder contains two AsciiDoc spec files, one parent and one child spec. There is also one report template.
+To process the specs, run the following command inside the `testdata` folder:
+
+[source, bash]
+----
+asciireq.py -o ../output -t report-template req-tool-user-reqs.adoc
+----
+
+This processes both specs (since they form a hierarchy) and puts the processed AsciiDoc files in the output folder.
+It will also process a separate report template and expand the table macros found there.
+You  can then generate html from these files:
+
+[source, bash]
+----
+asciidoc ../output/req-tool-user-reqs.adoc
+asciidoc ../output/req-tool-sw-reqs.adoc
+asciidoc ../output/report-template.adoc
+----
+
+The html files will have cross-links for all requirement relations and mentions, and contain some examples of how macros can be used for reporting.
+
+If you won't or can't run the examples, you will find the AsciiDoc output files in the output folder of the repo.
