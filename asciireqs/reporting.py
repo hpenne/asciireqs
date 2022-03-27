@@ -4,7 +4,7 @@ import os
 import re
 from typing import Dict, Iterable, List, Optional, Tuple
 
-import asciireqs.fields as fields
+from asciireqs.fields import ID, LINE_NO
 from asciireqs.docparser import Project
 from asciireqs.reqdocument import ReqDocument, Requirement, Requirements
 
@@ -36,7 +36,7 @@ def missing_link_from_parent(requirement: Requirement, project: Project) -> bool
         if 'Child' not in parent_req:
             return True
         parent_children_id = split_req_list(parent_req['Child'])
-        if not requirement[fields.ID] in parent_children_id:
+        if not requirement[ID] in parent_children_id:
             return True
     return False
 
@@ -89,7 +89,7 @@ def get_table(project: Project, requirements: Requirements, fields: List[str],
 def line_numbers_for_requirements(requirements: Requirements) -> Dict[int, str]:
     lines: Dict[int, str] = {}
     for req_id, attributes in requirements.items():
-        lines[int(attributes[fields.LINE_NO])] = req_id
+        lines[int(attributes[LINE_NO])] = req_id
     return lines
 
 
@@ -137,7 +137,7 @@ def post_process_hierarchically(project: Project, document: ReqDocument, output_
     output_path = os.path.join(output_dir, output_file_name)
     with open(document.name, 'r') as input_file:
         with open(output_path, 'w') as output_file:
-            for line_no, line in generate_report_line(enumerate(input_file, start=1), project,
+            for _, line in generate_report_line(enumerate(input_file, start=1), project,
                                                       document.reqs, requirement_lines):
                 output_file.write(line)
     for sub_doc in document.child_docs:

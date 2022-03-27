@@ -8,7 +8,7 @@ def test_keys() -> None:
     d = ReqDocument()
     d.add_keys(['a', 'b'])
     d.add_keys(['a', 'c'])
-    assert d.keys == ['a', 'b', 'c']
+    assert d.attribute_names == ['a', 'b', 'c']
 
 
 def test_reqs() -> None:

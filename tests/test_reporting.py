@@ -1,11 +1,11 @@
 """tests_reporting - Tests for reporting.py"""
 
-from asciireqs.fields import LINE_NO
+from asciireqs.fields import ID, LINE_NO
 from asciireqs.reporting import *
 
 
 def doc1_reqs() -> Requirements:
-    return {'D1-1': {fields.ID: 'D1-1', LINE_NO: 3}, 'D1-2': {fields.ID: 'D1-2', LINE_NO: 7}}
+    return {'D1-1': {ID: 'D1-1', LINE_NO: 3}, 'D1-2': {ID: 'D1-2', LINE_NO: 7}}
 
 
 def docs_with_req_prefix() -> ReqDocument:

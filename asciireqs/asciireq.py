@@ -29,8 +29,8 @@ def main() -> None:
         _, output_file_name = os.path.split(args.report_template)
         output_path = os.path.join(args.output_dir,
                                    output_file_name) if args.output_dir else args.report
-        with open(args.report_template, 'r') as template_file:
-            with open(output_path, 'w') as report_file:
+        with open(args.report_template, 'r', encoding="utf-8") as template_file:
+            with open(output_path, 'w', encoding="utf-8") as report_file:
                 for _, line in generate_report_line(enumerate(template_file, start=1), project,
                                                     project.requirements, {}):
                     report_file.write(line)

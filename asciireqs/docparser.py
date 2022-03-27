@@ -55,15 +55,13 @@ def get_cols_from_attribute(line: str, line_no: int) -> Optional[int]:
     num_widths = len(line.split(','))
     if num_widths >= 2:
         return num_widths
-    else:
-        eq_pos = line.find('=')
-        bracket_pos = line.find(']')
-        if 0 <= eq_pos < bracket_pos:
-            num_str = line[eq_pos + 1: bracket_pos]
-            return int(num_str)
-        else:
-            print(f'Error on line {line_no}, failed to parse number of columns: {line}')
-            return None
+    eq_pos = line.find('=')
+    bracket_pos = line.find(']')
+    if 0 <= eq_pos < bracket_pos:
+        num_str = line[eq_pos + 1: bracket_pos]
+        return int(num_str)
+    print(f'Error on line {line_no}, failed to parse number of columns: {line}')
+    return None
 
 
 def get_table(lines: Iterable[Tuple[int, str]]) -> Tuple[Optional[Row], Optional[Table]]:
