@@ -1,0 +1,14 @@
+= Requirements analysis report
+
+== Requirement document hierarchy
+
+`asciireq-hierarchy`
+
+== Requirements for release 1
+
+`asciireq-table: ID, Text, Tags; has_element(req["Tags"], "Rel-1")`
+
+== Requirements with missing links from parent
+
+`asciireq-table: ID, Text, Tags; link_error()`
+

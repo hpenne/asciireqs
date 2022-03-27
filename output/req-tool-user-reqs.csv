@@ -1,0 +1,17 @@
+ID,Text,Tags,Child
+UR-RMS-REQ-011,The SW shall support an internally hosted central data store.,Rel-1,SW-RMS-REQ-011
+UR-RMS-REQ-012,The SW shall support versioning and baselining,Rel-2,
+UR-RMS-REQ-013,The SW shall support review of changes and store the history of the review and approval process.,Rel-2,
+UR-RMS-REQ-014,The SW shall support an efficient and smooth process for the proposal and approval of changes, to facilitate collaboration.,Rel-2,
+UR-RMS-REQ-021,The SW shall support hierarchical specifications documents, and links between parent and child requirements.,Rel-1,SW-RMS-REQ-021
+UR-RMS-REQ-031,The SW shall support exporting requirements tables to other formats,Rel-1,SW-RMS-REQ-031
+UR-RMS-REQ-032,The SW shall support analysis of requirements links between parent and child.,Rel-2,SW-RMS-REQ-033, SW-RMS-REQ-034
+UR-RMS-REQ-033,The SW shall be able to generate reports based on filters.,Rel-2,SW-RMS-REQ-036
+SW-RMS-REQ-011,The requirements shall be stored an asciidoc text files, for storage in a configuration management system like git.,Rel-1,
+SW-RMS-REQ-021,An attribute for child documents shall be used to define the link between a parent and child specification document.,Rel-1,
+SW-RMS-REQ-031,The SW shall support exporting the requirements from a document to CVS format.,Rel-1,
+SW-RMS-REQ-032,The SW shall generate reports using asciidoc template files with macros that define the location and type of report elements to insert.,Rel-2,
+SW-RMS-REQ-033,The SW shall be able to generate a report table that lists requirements that lack parents.,Rel-2,
+SW-RMS-REQ-034,The SW shall be able to generate a report table that lists requirements that lack children.,Rel-2,
+SW-RMS-REQ-035,The SW shall be able to generate a report table that lists requirements that have inconsistent parent/child relationships (linked in only one direction).,Rel-2,
+SW-RMS-REQ-036,The SW shall be able to generate reports based on general requirement attribute filters.,Rel-2,

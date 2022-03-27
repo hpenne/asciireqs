@@ -30,7 +30,7 @@ This is a requirement table:
 
 |UR-XXX-REQ-1235
 |The product shall be fast
-|Rel-1
+|Rel-2
 |SSS-XXX-REQ-124
 |===
 

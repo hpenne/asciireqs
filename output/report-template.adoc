@@ -1,0 +1,53 @@
+= Requirements analysis report
+
+== Requirement document hierarchy
+
+* req-tool-user-reqs.adoc
+** req-tool-sw-reqs.adoc
+
+== Requirements for release 1
+
+|===
+|ID |Text |Tags 
+
+|UR-RMS-REQ-011
+|The SW shall support an internally hosted central data store.
+|Rel-1
+
+|UR-RMS-REQ-021
+|The SW shall support hierarchical specifications documents, and links between parent and child requirements.
+|Rel-1
+
+|UR-RMS-REQ-031
+|The SW shall support exporting requirements tables to other formats
+|Rel-1
+
+|SW-RMS-REQ-011
+|The requirements shall be stored an asciidoc text files, for storage in a configuration management system like git.
+|Rel-1
+
+|SW-RMS-REQ-021
+|An attribute for child documents shall be used to define the link between a parent and child specification document.
+|Rel-1
+
+|SW-RMS-REQ-031
+|The SW shall support exporting the requirements from a document to CVS format.
+|Rel-1
+
+|===
+
+== Requirements with missing links from parent
+
+|===
+|ID |Text |Tags 
+
+|SW-RMS-REQ-011
+|The requirements shall be stored an asciidoc text files, for storage in a configuration management system like git.
+|Rel-1
+
+|SW-RMS-REQ-035
+|The SW shall be able to generate a report table that lists requirements that have inconsistent parent/child relationships (linked in only one direction).
+|Rel-2
+
+|===
+
