@@ -193,5 +193,9 @@ def read_and_parse_project(file_path: str) -> Project:
     for sub_file_name in doc.child_doc_files:
         child_doc = read_and_parse(os.path.join(path, sub_file_name))
         doc.add_child_doc(child_doc)
-        requirements |= child_doc.reqs  # ToDo: Check for duplicates
+        for req_id, req in child_doc.reqs.items():
+            if req_id in requirements:
+                print(f'ERROR: Duplicate requirement {req_id}')
+            else:
+                requirements[req_id] = req
     return Project(doc, requirements)
