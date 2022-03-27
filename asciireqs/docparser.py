@@ -30,7 +30,7 @@ class Cell:
         return not self.data
 
 
-def empty_cell():
+def empty_cell() -> Cell:
     return Cell('', Location(0))
 
 
@@ -98,7 +98,8 @@ def get_table(lines: Iterable[Tuple[int, str]]) -> Tuple[Optional[Row], Optional
             if not num_columns and len(cells) > 0:
                 # If the number of columns has not been set, then this must be the heading row:
                 num_columns = len(cells)
-            append_cells(table_rows, num_columns, cells)
+            if num_columns:
+                append_cells(table_rows, num_columns, cells)
         else:
             if line.startswith('[cols'):
                 num_columns = get_cols_from_attribute(line, line_no)
@@ -115,13 +116,13 @@ def reqs_from_req_table(heading: Row, table_rows: Table) -> Iterable[Requirement
     if table_rows:
         for row in table_rows:
             req = {heading[i].data: cell.data for (i, cell) in enumerate(row)}
-            req[fields.LINE_NO] = row[0].location.line
+            req[fields.LINE_NO] = str(row[0].location.line)
             yield req
 
 
 def req_from_single_req_table(table_lines: Table) -> Optional[Requirement]:
     # First cell should be requirement ID
-    req = {fields.ID: table_lines[0][0].data, fields.LINE_NO: table_lines[0][0].location.line}
+    req = {fields.ID: table_lines[0][0].data, fields.LINE_NO: str(table_lines[0][0].location.line)}
     for cell in sum(table_lines, [])[1:]:
         if cell:
             parts = [part.strip() for part in cell.data.split(':')]

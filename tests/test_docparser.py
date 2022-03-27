@@ -76,8 +76,8 @@ def test_reqs_from_reqtable() -> None:
     reqs = list(reqs_from_req_table(heading, rows))
     assert reqs
     assert len(reqs) == 2
-    assert reqs[0] == {'1': 'A', '2': 'B', '3': 'C', fields.LINE_NO: 3}
-    assert reqs[1] == {'1': 'D', '2': 'E', '3': 'F', fields.LINE_NO: 4}
+    assert reqs[0] == {'1': 'A', '2': 'B', '3': 'C', fields.LINE_NO: '3'}
+    assert reqs[1] == {'1': 'D', '2': 'E', '3': 'F', fields.LINE_NO: '4'}
 
 
 def test_req_from_single_req_table() -> None:
@@ -87,7 +87,7 @@ def test_req_from_single_req_table() -> None:
     assert reqs
     assert len(reqs) == 5
     assert reqs == {fields.ID: 'ID-1', 'Parent': 'ID-2', 'Child': 'ID-3', 'Text': 'Text',
-                    fields.LINE_NO: 3}
+                    fields.LINE_NO: '3'}
 
 
 def test_req_from_single_req_table_with_three_rows() -> None:
@@ -98,4 +98,4 @@ def test_req_from_single_req_table_with_three_rows() -> None:
     assert reqs
     assert len(reqs) == 6
     assert reqs == {fields.ID: 'ID-1', 'Parent': 'ID-2', 'Child': 'ID-3', 'Tags': 'V.1',
-                    'Text': 'Text', fields.LINE_NO: 3}
+                    'Text': 'Text', fields.LINE_NO: '3'}

@@ -18,7 +18,7 @@ class ReqDocument:
     keys: List[str]
     reqs: Requirements
     child_doc_files: List[str]
-    child_docs: List[str]
+    child_docs: List[ReqDocument]
     req_prefix: str
 
     def __init__(self) -> None:

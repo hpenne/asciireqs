@@ -89,7 +89,7 @@ def get_table(project: Project, requirements: Requirements, fields: List[str],
 def line_numbers_for_requirements(requirements: Requirements) -> Dict[int, str]:
     lines: Dict[int, str] = {}
     for req_id, attributes in requirements.items():
-        lines[attributes[fields.LINE_NO]] = req_id
+        lines[int(attributes[fields.LINE_NO])] = req_id
     return lines
 
 
@@ -131,7 +131,7 @@ def generate_report_line(input_lines: Iterable[Tuple[int, str]],
                 yield line_no, insert_requirement_links(input_line, project.root_document)
 
 
-def post_process_hierarchically(project: Project, document: ReqDocument, output_dir: str):
+def post_process_hierarchically(project: Project, document: ReqDocument, output_dir: str) -> None:
     requirement_lines = line_numbers_for_requirements(document.reqs)
     _, output_file_name = os.path.split(document.name)
     output_path = os.path.join(output_dir, output_file_name)
