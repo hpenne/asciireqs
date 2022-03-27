@@ -74,7 +74,7 @@ def test_missing_link_from_parent_link_ok() -> None:
     ur.child_docs = [sr]
     sr1 = {'ID': 'SR-1', 'Parent': 'UR-1'}
     sr.reqs['SR-1'] = sr1
-    project = Project(ur, ur.reqs | sr.reqs)
+    project = Project(ur, {**ur.reqs, **sr.reqs})
     assert not missing_link_from_parent(sr1, project)
     assert not evaluate_requirement_against_filter(sr1, project, 'link_error()')
 
@@ -86,7 +86,7 @@ def test_missing_link_from_parent_no_downlink() -> None:
     ur.child_docs = [sr]
     sr1 = {'ID': 'SR-1', 'Parent': 'UR-1'}
     sr.reqs['SR-1'] = sr1
-    project = Project(ur, ur.reqs | sr.reqs)
+    project = Project(ur, {**ur.reqs, **sr.reqs})
     assert missing_link_from_parent(sr1, project)
     assert evaluate_requirement_against_filter(sr1, project, 'link_error()')
 
@@ -99,7 +99,7 @@ def test_missing_link_from_parent_one_of_two_downlinks_ok() -> None:
     ur.child_docs = [sr]
     sr1 = {'ID': 'SR-1', 'Parent': 'UR-1, UR-2'}
     sr.reqs['SR-1'] = sr1
-    project = Project(ur, ur.reqs | sr.reqs)
+    project = Project(ur, {**ur.reqs, **sr.reqs})
     assert missing_link_from_parent(sr1, project)
 
 
@@ -111,7 +111,7 @@ def test_missing_link_from_parent_two_of_two_downlinks_ok() -> None:
     ur.child_docs = [sr]
     sr1 = {'ID': 'SR-1', 'Parent': 'UR-1, UR-2'}
     sr.reqs['SR-1'] = sr1
-    project = Project(ur, ur.reqs | sr.reqs)
+    project = Project(ur, {**ur.reqs, **sr.reqs})
     assert not missing_link_from_parent(sr1, project)
     assert evaluate_requirement_against_filter(sr1, project,
                                                'has_element(req["Parent"], "UR-1")')
