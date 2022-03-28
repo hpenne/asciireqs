@@ -1,6 +1,6 @@
 """test_reqdocument: Tests for the reqdocument module"""
 
-from asciireqs.reqdocument import *
+from asciireqs.reqdocument import ReqDocument
 import asciireqs.fields as fields
 
 

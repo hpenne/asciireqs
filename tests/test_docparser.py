@@ -1,6 +1,10 @@
 """test_docparser: Tests for the docparser modele"""
 
-from asciireqs.docparser import *
+from typing import List, Tuple
+
+from asciireqs.docparser import Cell, Location, get_table, reqs_from_req_table, \
+    req_from_single_req_table
+from asciireqs.fields import ID, LINE_NO
 
 
 def row(elements: List[Tuple[str, int]]) -> List[Cell]:
@@ -76,8 +80,8 @@ def test_reqs_from_reqtable() -> None:
     reqs = list(reqs_from_req_table(heading, rows))
     assert reqs
     assert len(reqs) == 2
-    assert reqs[0] == {'1': 'A', '2': 'B', '3': 'C', fields.LINE_NO: '3'}
-    assert reqs[1] == {'1': 'D', '2': 'E', '3': 'F', fields.LINE_NO: '4'}
+    assert reqs[0] == {'1': 'A', '2': 'B', '3': 'C', LINE_NO: '3'}
+    assert reqs[1] == {'1': 'D', '2': 'E', '3': 'F', LINE_NO: '4'}
 
 
 def test_req_from_single_req_table() -> None:
@@ -86,8 +90,8 @@ def test_req_from_single_req_table() -> None:
     reqs = req_from_single_req_table(rows)
     assert reqs
     assert len(reqs) == 5
-    assert reqs == {fields.ID: 'ID-1', 'Parent': 'ID-2', 'Child': 'ID-3', 'Text': 'Text',
-                    fields.LINE_NO: '3'}
+    assert reqs == {ID: 'ID-1', 'Parent': 'ID-2', 'Child': 'ID-3', 'Text': 'Text',
+                    LINE_NO: '3'}
 
 
 def test_req_from_single_req_table_with_three_rows() -> None:
@@ -97,5 +101,5 @@ def test_req_from_single_req_table_with_three_rows() -> None:
     reqs = req_from_single_req_table(rows)
     assert reqs
     assert len(reqs) == 6
-    assert reqs == {fields.ID: 'ID-1', 'Parent': 'ID-2', 'Child': 'ID-3', 'Tags': 'V.1',
-                    'Text': 'Text', fields.LINE_NO: '3'}
+    assert reqs == {ID: 'ID-1', 'Parent': 'ID-2', 'Child': 'ID-3', 'Tags': 'V.1',
+                    'Text': 'Text', LINE_NO: '3'}

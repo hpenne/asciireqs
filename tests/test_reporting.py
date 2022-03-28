@@ -1,7 +1,10 @@
 """tests_reporting - Tests for reporting.py"""
-
+from asciireqs.docparser import Project
 from asciireqs.fields import ID, LINE_NO
-from asciireqs.reporting import *
+from asciireqs.reporting import get_spec_hierarchy, line_numbers_for_requirements, \
+    insert_requirement_links, insert_anchor, has_element, split_req_list, \
+    missing_link_from_parent, evaluate_requirement_against_filter
+from asciireqs.reqdocument import ReqDocument, Requirements
 
 
 def doc1_reqs() -> Requirements:
@@ -38,17 +41,17 @@ def test_get_spec_hierarchy() -> None:
 
 def test_insert_requirement_links() -> None:
     doc = docs_with_req_prefix()
-    assert insert_requirement_links('This is the UR-REQ-001 requirement', doc)\
-           == 'This is the xref:ur-reqs.adoc#UR-REQ-001[UR-REQ-001] requirement'
-    assert insert_requirement_links('This is the SW-REQ-002 requirement', doc) \
-           == 'This is the xref:sw-reqs.adoc#SW-REQ-002[SW-REQ-002] requirement'
+    assert insert_requirement_links('This is the UR-REQ-001 requirement',
+                                    doc) == 'This is the xref:ur-reqs.adoc#UR-REQ-001[UR-REQ-001] requirement'
+    assert insert_requirement_links('This is the SW-REQ-002 requirement',
+                                    doc) == 'This is the xref:sw-reqs.adoc#SW-REQ-002[SW-REQ-002] requirement'
 
 
 def test_insert_anchor() -> None:
     doc = docs_with_req_prefix()
     assert insert_anchor('| SW-REQ-001', 'SW-REQ-001', doc) == '| [[SW-REQ-001]]SW-REQ-001'
-    assert insert_anchor('| SW-REQ-001 | UR-REQ-002', 'SW-REQ-001', doc)\
-           == '| [[SW-REQ-001]]SW-REQ-001 | xref:ur-reqs.adoc#UR-REQ-002[UR-REQ-002]'
+    assert insert_anchor('| SW-REQ-001 | UR-REQ-002', 'SW-REQ-001',
+                         doc) == '| [[SW-REQ-001]]SW-REQ-001 | xref:ur-reqs.adoc#UR-REQ-002[UR-REQ-002]'
 
 
 def test_has_element() -> None:
@@ -113,7 +116,6 @@ def test_missing_link_from_parent_two_of_two_downlinks_ok() -> None:
     sr.reqs['SR-1'] = sr1
     project = Project(ur, {**ur.reqs, **sr.reqs})
     assert not missing_link_from_parent(sr1, project)
-    assert evaluate_requirement_against_filter(sr1, project,
-                                               'has_element(req["Parent"], "UR-1")')
+    assert evaluate_requirement_against_filter(sr1, project, 'has_element(req["Parent"], "UR-1")')
     assert not evaluate_requirement_against_filter(sr1, project,
                                                    'has_element(req["Parent"], "UR-3")')
