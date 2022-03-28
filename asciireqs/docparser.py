@@ -6,31 +6,36 @@ from copy import copy
 from dataclasses import dataclass
 from typing import Iterable, List, Optional, Tuple
 
+from asciireqs import fields
 from asciireqs.reqdocument import ReqDocument, Requirement, Requirements
-import asciireqs.fields as fields
 
 
 @dataclass
 class Project:
+    """This class holds the complete project data model"""
     root_document: ReqDocument
     requirements: Requirements
 
 
 @dataclass
 class Location:
+    """This class hold information about the file location of a requirement"""
     line: int
 
 
 @dataclass
 class Cell:
+    """This class holds the contents of a table cell"""
     data: str
     location: Location
 
     def empty(self) -> bool:
+        """Returns True if the Cell is empty"""
         return not self.data
 
 
 def empty_cell() -> Cell:
+    """Returns an empty Cell"""
     return Cell('', Location(0))
 
 
@@ -40,6 +45,7 @@ Table = List[Row]
 
 
 def append_cells(table_rows: Table, num_columns: int, cells: Cells) -> None:
+    """Takes a list of cells and appends them to the table, breaking them into rows"""
     if not table_rows and len(cells) > 0:
         table_rows.append(cells)
     else:
@@ -51,6 +57,7 @@ def append_cells(table_rows: Table, num_columns: int, cells: Cells) -> None:
 
 
 def get_cols_from_attribute(line: str, line_no: int) -> Optional[int]:
+    """Interprets an AsciiDoc 'cols' attribute to get the number of table columns"""
     # This is crude, but it usually works:
     num_widths = len(line.split(','))
     if num_widths >= 2:
@@ -65,6 +72,8 @@ def get_cols_from_attribute(line: str, line_no: int) -> Optional[int]:
 
 
 def get_table(lines: Iterable[Tuple[int, str]]) -> Tuple[Optional[Row], Optional[Table]]:
+    """Takes AsciiDoc lines of text and interprets it to get a Table"""
+    # pylint: disable = R0912
     in_table: bool = False
     num_columns: Optional[int] = None
     table_rows: Table = []
@@ -111,6 +120,7 @@ def get_table(lines: Iterable[Tuple[int, str]]) -> Tuple[Optional[Row], Optional
 
 
 def reqs_from_req_table(heading: Row, table_rows: Table) -> Iterable[Requirement]:
+    """Takes a table and returns the requirements in it"""
     if table_rows:
         for row in table_rows:
             req = {heading[i].data: cell.data for (i, cell) in enumerate(row)}
@@ -119,6 +129,7 @@ def reqs_from_req_table(heading: Row, table_rows: Table) -> Iterable[Requirement
 
 
 def req_from_single_req_table(table_lines: Table) -> Optional[Requirement]:
+    """Takes a table form and returns the single requirement in it"""
     # First cell should be requirement ID
     req = {fields.ID: table_lines[0][0].data, fields.LINE_NO: str(table_lines[0][0].location.line)}
     for cell in sum(table_lines, [])[1:]:
@@ -143,6 +154,7 @@ def req_from_single_req_table(table_lines: Table) -> Optional[Requirement]:
 
 
 def get_attribute(line: str, name: str) -> Optional[str]:
+    """Looks for a specific AsciiDoc attribute in a line and returns the value if found"""
     attribute = ':' + name + ':'
     if line.startswith(attribute):
         return line[len(attribute):].strip()
@@ -150,6 +162,7 @@ def get_attribute(line: str, name: str) -> Optional[str]:
 
 
 def parse_doc(lines: Iterable[Tuple[int, str]]) -> ReqDocument:
+    """Parses lines of AsciiDoc text and returns a ReqDocument with all the requirements etc."""
     doc = ReqDocument()
     for _, text in lines:
         text = text.rstrip()
@@ -157,7 +170,7 @@ def parse_doc(lines: Iterable[Tuple[int, str]]) -> ReqDocument:
             heading, rows = get_table(lines)
             if heading and rows:
                 doc.add_reqs(reqs_from_req_table(heading, rows))
-                doc.add_keys([cell.data for cell in heading])
+                doc.add_keys([cell.data for cell in heading])  # pylint: disable=E1133
         elif text == '[.req]':
             heading, rows = get_table(lines)
             if rows:
@@ -168,7 +181,8 @@ def parse_doc(lines: Iterable[Tuple[int, str]]) -> ReqDocument:
         else:
             attribute_value = get_attribute(text, 'req-children')
             if attribute_value:
-                doc.child_doc_files = [file_name.strip() for file_name in attribute_value.split(',')]
+                doc.child_doc_files = [file_name.strip() for file_name in
+                                       attribute_value.split(',')]
             attribute_value = get_attribute(text, 'req-prefix')
             if attribute_value:
                 doc.req_prefix = attribute_value
@@ -176,7 +190,8 @@ def parse_doc(lines: Iterable[Tuple[int, str]]) -> ReqDocument:
 
 
 def read_and_parse(file_name: str) -> ReqDocument:
-    with open(file_name, 'r') as file:
+    """Parses an AsciiDoc file and returns a ReqDocument with all the requirements etc."""
+    with open(file_name, 'r', encoding="utf-8") as file:
         doc = parse_doc(enumerate(file, start=1))
         doc.name = file_name
         for req in doc.reqs.values():
@@ -185,6 +200,7 @@ def read_and_parse(file_name: str) -> ReqDocument:
 
 
 def read_and_parse_project(file_path: str) -> Project:
+    """Takes the path to the to level specification and returns a complete project model"""
     path, _ = os.path.split(file_path)
     doc = read_and_parse(file_path)
     requirements = copy(doc.reqs)

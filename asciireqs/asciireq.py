@@ -1,4 +1,5 @@
-#!/usr/bin/env python3
+"""asciireq - This is the main program to parse requirements and generate reports"""
+# !/usr/bin/env python3
 
 import argparse
 import os
@@ -6,11 +7,10 @@ import sys
 
 from asciireqs.docparser import read_and_parse_project
 from asciireqs.reporting import generate_report_line, post_process_hierarchically
-from asciireqs.reporting import line_numbers_for_requirements
 
 
-# ToDo: Section and line numbers in requirements attributes
 def main() -> None:
+    """Parses AsciiDoc documents, finds the requirements and generates reports"""
     parser = argparse.ArgumentParser(description='Get requirements from an asciidoc file')
     parser.add_argument('reqdoc', help='File to parse')
     parser.add_argument('-t', '--template', dest='report_template', type=str,

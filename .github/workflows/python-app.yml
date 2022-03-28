@@ -38,6 +38,6 @@ jobs:
     - name: Analysing the code with mypy
       run: |
         mypy --strict $(git ls-files 'asciireqs/*.py')
-#    - name: Analysing the code with pylint
-#      run: |
-#        pylint $(git ls-files 'asciireqs/*.py')
+    - name: Analysing the code with pylint
+      run: |
+        pylint $(git ls-files 'asciireqs/*.py')
