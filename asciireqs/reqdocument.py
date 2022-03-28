@@ -15,6 +15,7 @@ Requirements = Dict[str, Requirement]
 @dataclass
 class ReqDocument:
     """This class holds all data about a requirement document"""
+
     name: str
     attribute_names: List[str]
     reqs: Requirements
@@ -23,12 +24,12 @@ class ReqDocument:
     req_prefix: str
 
     def __init__(self) -> None:
-        self.name = ''
+        self.name = ""
         self.attribute_names: List[str] = []
         self.reqs: Requirements = {}
         self.child_doc_files: List[str] = []
         self.child_docs: List[ReqDocument] = []
-        self.req_prefix: str = ''
+        self.req_prefix: str = ""
 
     def add_keys(self, keys: List[str]) -> None:
         """Takes a list of requirement attribute names, and adds new ones to 'attribute_names'"""
@@ -41,7 +42,7 @@ class ReqDocument:
         req_id = requirement[ID]
         assert req_id
         if req_id in self.reqs:
-            print(f'ERROR: Duplicate requirement {req_id}')
+            print(f"ERROR: Duplicate requirement {req_id}")
         else:
             self.reqs[req_id] = requirement
 
