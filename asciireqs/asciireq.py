@@ -14,13 +14,13 @@ def main() -> None:
     parser = argparse.ArgumentParser(
         description="Get requirements from an asciidoc file"
     )
-    parser.add_argument("reqdoc", help="File to parse")
     parser.add_argument(
         "-t", "--template", dest="report_template", type=str, help="Report template"
     )
     parser.add_argument(
         "-o", "--outputdir", dest="output_dir", type=str, help="Output directory"
     )
+    parser.add_argument("reqdoc", help="File to parse")
     args = parser.parse_args()
 
     project = read_and_parse_project(args.reqdoc)
