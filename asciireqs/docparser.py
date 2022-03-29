@@ -92,7 +92,6 @@ def get_table(
     lines: Iterable[Tuple[int, str]]
 ) -> Tuple[Optional[Row], Optional[Table]]:
     """Takes AsciiDoc lines of text and interprets it to get a Table"""
-    # pylint: disable = R0912
     in_table: bool = False
     num_columns: Optional[int] = None
     table_rows: Table = []
