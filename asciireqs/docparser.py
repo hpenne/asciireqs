@@ -68,7 +68,7 @@ def get_cols_from_attribute(line: str, line_no: int) -> Optional[int]:
     eq_pos = line.find("=")
     bracket_pos = line.find("]")
     if 0 <= eq_pos < bracket_pos:
-        num_str = line[eq_pos + 1: bracket_pos]
+        num_str = line[eq_pos + 1 : bracket_pos]
         return int(num_str)
     print(f"Error on line {line_no}, failed to parse number of columns: {line}")
     return None
@@ -89,7 +89,7 @@ def cells_from_line(line: str, line_no: int) -> Cells:
 
 
 def get_table(
-        lines: Iterable[Tuple[int, str]]
+    lines: Iterable[Tuple[int, str]]
 ) -> Tuple[Optional[Row], Optional[Table]]:
     """Takes AsciiDoc lines of text and interprets it to get a Table"""
     # pylint: disable = R0912
@@ -178,7 +178,7 @@ def get_attribute(line: str, name: str) -> Optional[str]:
     """Looks for a specific AsciiDoc attribute in a line and returns the value if found"""
     attribute = ":" + name + ":"
     if line.startswith(attribute):
-        return line[len(attribute):].strip()
+        return line[len(attribute) :].strip()
     return None
 
 
