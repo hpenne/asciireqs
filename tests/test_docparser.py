@@ -1,13 +1,14 @@
 """test_docparser: Tests for the docparser modele"""
 
 from typing import List, Tuple
-
 from asciireqs.docparser import (
     Cell,
     Location,
     get_table,
     reqs_from_req_table,
     req_from_single_req_table,
+    get_source_block,
+    req_from_yaml_block,
 )
 from asciireqs.fields import ID, LINE_NO
 
@@ -133,3 +134,34 @@ def test_req_from_single_req_table_with_three_rows() -> None:
         "Text": "Text",
         LINE_NO: "3",
     }
+
+
+def test_get_source_block_with_empty_input() -> None:
+    assert get_source_block(enumerate([])) == ([], 0)
+
+
+def test_get_source_block_not_starting_correctly() -> None:
+    assert get_source_block(enumerate(["foo", "----", "bar", "----"], start=1)) == ([], 0)
+
+
+def test_get_source_block() -> None:
+    source_input = ["Line 1", "Line 2", "   Line 3"]
+    source_block_marker = ["----"]
+    source = get_source_block(
+        enumerate(source_block_marker + source_input + source_block_marker, start=1)
+    )
+    assert source == (source_input, 2)
+
+
+def test_req_from_yaml_block_with_empty_input() -> None:
+    assert not req_from_yaml_block([], 13)
+
+
+def test_req_from_yaml_block_with_simple_requirement() -> None:
+    req = req_from_yaml_block(["ID: SR-001", "Text: Some requirement"], 13)
+    assert req == {"ID": "SR-001", "Text": "Some requirement", LINE_NO: str(13)}
+
+
+def test_req_from_yaml_block_with_id_on_second_line() -> None:
+    req = req_from_yaml_block(["ID: |", "  SR-001", "Text: Some requirement"], 13)
+    assert req == {"ID": "SR-001", "Text": "Some requirement", LINE_NO: str(14)}

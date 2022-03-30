@@ -30,6 +30,10 @@
 |An attribute for child documents shall be used to define the link between a parent and child specification document.
 |Rel-1
 
+|SW-RMS-REQ-022
+|The SW shall insert AsciiDoc anchors for the requirement definition and cross-links where they are referenced
+|Rel-1
+
 |SW-RMS-REQ-031
 |The SW shall support exporting the requirements from a document to CVS format.
 |Rel-1
@@ -43,6 +47,10 @@
 
 |SW-RMS-REQ-011
 |The requirements shall be stored an asciidoc text files, for storage in a configuration management system like git.
+|Rel-1
+
+|SW-RMS-REQ-022
+|The SW shall insert AsciiDoc anchors for the requirement definition and cross-links where they are referenced
 |Rel-1
 
 |SW-RMS-REQ-035

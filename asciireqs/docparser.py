@@ -5,6 +5,7 @@ import re
 from copy import copy
 from dataclasses import dataclass
 from typing import Iterable, List, Optional, Tuple
+import yaml
 
 from asciireqs import fields
 from asciireqs.reqdocument import ReqDocument, Requirement, Requirements
@@ -131,6 +132,32 @@ def get_table(
     return None, None
 
 
+def get_source_block(lines: Iterable[Tuple[int, str]]) -> Tuple[List[str], int]:
+    """
+    Takes AsciiDoc lines of text (starting with a source block) and consumes the sopurce block
+    lines and returns them (not including the '----' start and end lines)
+    :param lines: The input lines
+    :return: The contents of the source block
+    """
+    is_first = True
+    source: List[str] = []
+    first_line_no: int = 0
+    for line_no, line in lines:
+        if is_first:
+            first_line = line.strip(" \n")
+            if first_line != "----":
+                print(f"Error: Not a YAML block on line {line_no}")
+                return [], 0
+            first_line_no = line_no + 1
+            is_first = False
+        else:
+            line = line.rstrip(" \n")
+            if line == "----":
+                return source, first_line_no
+            source = source + [line]
+    return [], 0
+
+
 def reqs_from_req_table(heading: Row, table_rows: Table) -> Iterable[Requirement]:
     """Takes a table and returns the requirements in it"""
     if table_rows:
@@ -173,6 +200,27 @@ def req_from_single_req_table(table_lines: Table) -> Optional[Requirement]:
     return req
 
 
+def req_from_yaml_block(lines: List[str], line_no: int) -> Optional[Requirement]:
+    """Takes a list of YAML source lines and returns a requirement"""
+    attributes = yaml.safe_load("\n".join(lines))
+    if not attributes:
+        print(f"Error: Failed to parse YAML on line {line_no}")
+        return None
+    if fields.ID not in attributes:
+        print(f"Error: Missing ID attribute on line {line_no}")
+        return None
+    req = {}
+    for name, value in attributes.items():
+        req[name] = str(value).strip(" \n")
+
+    # The line number must be the line the ID is on, so we need to search for it:
+    req_id = req[fields.ID]
+    for id_line_no, line in enumerate(lines, start=line_no):
+        if line.find(req_id) >= 0:
+            req[fields.LINE_NO] = str(id_line_no)
+    return req
+
+
 def get_attribute(line: str, name: str) -> Optional[str]:
     """Looks for a specific AsciiDoc attribute in a line and returns the value if found"""
     attribute = ":" + name + ":"
@@ -195,6 +243,13 @@ def parse_doc(lines: Iterable[Tuple[int, str]]) -> ReqDocument:
             heading, rows = get_table(lines)
             if rows:
                 req = req_from_single_req_table(rows)
+                if req:
+                    doc.add_keys(list(req.keys()))
+                    doc.add_req(req)
+        elif text == "[.reqy]":
+            yaml_lines, start_line_no = get_source_block(lines)
+            if yaml_lines:
+                req = req_from_yaml_block(yaml_lines, start_line_no)
                 if req:
                     doc.add_keys(list(req.keys()))
                     doc.add_req(req)
