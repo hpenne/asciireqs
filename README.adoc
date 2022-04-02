@@ -44,7 +44,7 @@ perhaps a table form.
 
 == How does it work?
 
-Write your requirement specification in asciidoc.
+Write your requirement specification in AsciiDoc.
 Put the requirements in tables.
 
 === Defining requirements
@@ -52,7 +52,7 @@ Put the requirements in tables.
 ==== Tables with multiple requirements
 
 The simplest way is to put them in table with a heading row defining the requirement fields, and where each normal row defines a requirement.
-The line immediately before the table is marked with an asciidoc "role" (.reqs) to mark the table as an asciireqs requirement table:
+The line immediately before the table is marked with an AsciiDoc "role" (.reqs) to mark the table as an asciireqs requirement table:
 
 [source, asciidoc]
 ----
@@ -73,7 +73,7 @@ The line immediately before the table is marked with an asciidoc "role" (.reqs) 
 |===
 ----
 
-This will be rendered by asciidoc as:
+This will be rendered by AsciiDoc as:
 [cols="2,4,1,2"]
 |===
 |ID |Text |Tags |Child
@@ -118,7 +118,7 @@ This renders as:
 3+|This is the text that defines the requirement.
 |===
 
-Notice how the asciidoc "cols" attribute is used here to define the number of columns when the table has no heading row.
+Notice how the AsciiDoc "cols" attribute is used here to define the number of columns when the table has no heading row.
 
 Also notice that the first cell is the requirement ID implicitly, while the other cells use a "property: value" syntax to define requirement property names and values (unlike a normal table where the column heading defines the property names).
 The exception is the last merged cell that defines the requirement Text property.
