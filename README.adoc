@@ -125,6 +125,32 @@ The exception is the last merged cell that defines the requirement Text property
 
 You can use as many rows of requirement properties as necessary, but the last row must be a single merged cell containing the requirement text.
 
+==== YAML block with a single requirement
+
+It is also possible to define a requirement as a block of YAML.
+YAML is a simple property-value format, which is easy to read and write.
+The following lines of AsciiDoc will define a requirement using YAML:
+
+[source, asciidoc]
+-----
+[.reqy]
+----
+ID: UR-RMS-021
+Child: SW-RMS-021
+Tags: V.1
+Text: This is the text that defines the requirement
+----
+-----
+
+Some may find this format easier to read and write while working with the requirements, but it leaves a little to be desired in the final print.
+AsciiReqs will therefore transform this into an AsciiDoc "Term" in the following style when the adoc files are processed:
+
+UR-RMS-021:: This is the text that defines the requirement
++
+Child: SW-RMS-021; Tags: V.1
+
+This is different from using tables, where the only modification made during processing is to insert anchors and cross-links for the requirement IDs.
+
 ==== Requirement properties
 
 The requirements consist of named properties with values.
