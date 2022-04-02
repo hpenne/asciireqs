@@ -39,7 +39,7 @@ def main() -> None:
         )
         with open(args.report_template, "r", encoding="utf-8") as template_file:
             with open(output_path, "w", encoding="utf-8") as report_file:
-                for _, line in generate_report_line(
+                for line in generate_report_line(
                     enumerate(template_file, start=1), project, project.requirements, {}
                 ):
                     report_file.write(line)

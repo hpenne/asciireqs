@@ -42,14 +42,10 @@ This a sample SW requirement specification for testing of asciireqs, containing 
 3+|An attribute for child documents shall be used to define the link between a parent and child specification document.
 |===
 
-[.reqy]
-----
-ID: [[SW-RMS-REQ-022]]SW-RMS-REQ-022
-Parent: xref:req-tool-user-reqs.adoc#UR-RMS-REQ-021[UR-RMS-REQ-021]
-Tags: Rel-1
-Text: |
-    The SW shall insert AsciiDoc anchors for the requirement definition and cross-links where they are referenced
-----
+[horizontal]
+SW-RMS-REQ-022:: The SW shall insert AsciiDoc anchors for the requirement definition and cross-links where they are referenced
++
+Parent: UR-RMS-REQ-021, Tags: Rel-1
 
 === Reporting
 

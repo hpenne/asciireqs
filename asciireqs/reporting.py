@@ -4,8 +4,8 @@ import os
 import re
 from typing import Dict, Iterable, List, Optional, Tuple
 
-from asciireqs.fields import ID, LINE_NO
-from asciireqs.docparser import Project
+from asciireqs.fields import ID, LINE_NO, TEXT, PARENT, CHILD
+from asciireqs.docparser import Project, req_from_yaml_lines
 from asciireqs.reqdocument import ReqDocument, Requirement, Requirements
 
 
@@ -156,12 +156,30 @@ def insert_anchor(line: str, req_id: str, root_document: ReqDocument) -> str:
     )
 
 
+# ToDo: Unit test and doc
+def requirement_as_term(req: Requirement) -> Iterable[str]:
+    yield "[horizontal]\n"
+    yield req[ID] + ":: " + req[TEXT] + "\n"
+    yield "+\n"
+    attr_line = ""
+    first = True
+    for attribute, value in req.items():  # ToDo: Comprehension with join
+        if attribute not in (ID, TEXT, LINE_NO):
+            if first:
+                first = False
+            else:
+                attr_line = attr_line + "; "
+            attr_line = attr_line + attribute + ": " + value
+    attr_line += "\n"
+    yield attr_line  # ToDo: Anchors and links
+
+
 def generate_report_line(
     input_lines: Iterable[Tuple[int, str]],
     project: Project,
     requirements: Requirements,
     req_lines: Dict[int, str],
-) -> Iterable[Tuple[int, str]]:
+) -> Iterable[str]:
     """
     Takes lines of AsciiDoc text and parses it to generate lines of AsciiDoc output.
     The parsing will insert cross-links and expand report generating macros,
@@ -176,7 +194,7 @@ def generate_report_line(
         stripped_line: str = input_line.strip()
         if stripped_line == "`asciireq-hierarchy`":
             for line in get_spec_hierarchy(project.root_document, ""):
-                yield line_no, line
+                yield line
         elif stripped_line.startswith("`asciireq-table:") and stripped_line.endswith(
             "`"
         ):
@@ -187,17 +205,22 @@ def generate_report_line(
             for line in get_table(
                 project, requirements, field_names, filter_expression
             ):
-                yield line_no, line
+                yield line
+        elif stripped_line.startswith("[.reqy]"):
+            # Consume the listing block of YAML:
+            req_from_yaml = req_from_yaml_lines(input_lines)
+            if req_from_yaml and ID in req_from_yaml and req_from_yaml[ID] in requirements:
+                # Replace with formatting using "Term":
+                req = requirements[req_from_yaml[ID]]
+                yield from requirement_as_term(req)
         else:
             if line_no in req_lines:
                 # This line contains a requirement definition which we want to make into an anchor:
-                yield line_no, insert_anchor(
+                yield insert_anchor(
                     input_line, req_lines[line_no], project.root_document
                 )
             else:
-                yield line_no, insert_requirement_links(
-                    input_line, project.root_document
-                )
+                yield insert_requirement_links(input_line, project.root_document)
 
 
 def post_process_hierarchically(
@@ -217,7 +240,7 @@ def post_process_hierarchically(
     output_path = os.path.join(output_dir, output_file_name)
     with open(document.name, "r", encoding="utf-8") as input_file:
         with open(output_path, "w", encoding="utf-8") as output_file:
-            for _, line in generate_report_line(
+            for line in generate_report_line(
                 enumerate(input_file, start=1),
                 project,
                 document.reqs,

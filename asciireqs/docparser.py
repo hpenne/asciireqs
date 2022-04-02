@@ -200,7 +200,7 @@ def req_from_single_req_table(table_lines: Table) -> Optional[Requirement]:
     return req
 
 
-def req_from_yaml_block(lines: List[str], line_no: int) -> Optional[Requirement]:
+def req_from_yaml_dict(lines: List[str], line_no: int) -> Optional[Requirement]:
     """Takes a list of YAML source lines and returns a requirement"""
     attributes = yaml.safe_load("\n".join(lines))
     if not attributes:
@@ -219,6 +219,19 @@ def req_from_yaml_block(lines: List[str], line_no: int) -> Optional[Requirement]
         if line.find(req_id) >= 0:
             req[fields.LINE_NO] = str(id_line_no)
     return req
+
+
+def req_from_yaml_lines(lines: Iterable[Tuple[int, str]]) -> Optional[Requirement]:
+    """
+    Takes AsciiDoc lines of text (starting with a source block), consumes the source block
+    lines, converts to YAML and returns the requirement defined by the YAML
+    :param lines: The input lines
+    :return: The requirement (or None if not found)
+    """
+    yaml_lines, start_line_no = get_source_block(lines)
+    if yaml_lines:
+        return req_from_yaml_dict(yaml_lines, start_line_no)
+    return None
 
 
 def get_attribute(line: str, name: str) -> Optional[str]:
@@ -247,12 +260,10 @@ def parse_doc(lines: Iterable[Tuple[int, str]]) -> ReqDocument:
                     doc.add_keys(list(req.keys()))
                     doc.add_req(req)
         elif text == "[.reqy]":
-            yaml_lines, start_line_no = get_source_block(lines)
-            if yaml_lines:
-                req = req_from_yaml_block(yaml_lines, start_line_no)
-                if req:
-                    doc.add_keys(list(req.keys()))
-                    doc.add_req(req)
+            req = req_from_yaml_lines(lines)
+            if req:
+                doc.add_keys(list(req.keys()))
+                doc.add_req(req)
         else:
             attribute_value = get_attribute(text, "req-children")
             if attribute_value:

@@ -1,6 +1,6 @@
 """tests_reporting - Tests for reporting.py"""
 from asciireqs.docparser import Project
-from asciireqs.fields import ID, LINE_NO
+from asciireqs.fields import ID, LINE_NO, TEXT, PARENT, CHILD
 from asciireqs.reporting import (
     get_spec_hierarchy,
     line_numbers_for_requirements,
@@ -10,6 +10,7 @@ from asciireqs.reporting import (
     split_req_list,
     missing_link_from_parent,
     evaluate_requirement_against_filter,
+    requirement_as_term,
 )
 from asciireqs.reqdocument import ReqDocument, Requirements
 
@@ -137,3 +138,19 @@ def test_missing_link_from_parent_two_of_two_downlinks_ok() -> None:
     assert not evaluate_requirement_against_filter(
         sr1, project, 'has_element(req["Parent"], "UR-3")'
     )
+
+
+def test_requirement_as_term() -> None:
+    req = {
+        ID: "R-1",
+        TEXT: "Some requirement",
+        PARENT: "UR-1",
+        CHILD: "SR-1, SR-2",
+        LINE_NO: "100",
+    }
+    lines = list(requirement_as_term(req))
+    assert len(lines) == 4
+    assert lines[0] == "[horizontal]\n"
+    assert lines[1] == "R-1:: Some requirement\n"
+    assert lines[2] == "+\n"
+    assert lines[3] == "Parent: UR-1; Child: SR-1, SR-2\n"
