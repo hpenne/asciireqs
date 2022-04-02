@@ -245,7 +245,7 @@ def get_attribute(line: str, name: str) -> Optional[str]:
     return None
 
 
-def heading_names(heading: Row) -> list[str]:
+def heading_names(heading: Row) -> List[str]:
     """Takes a list of heading cells and returns the heading names"""
     return [cell.data for cell in heading]
 
