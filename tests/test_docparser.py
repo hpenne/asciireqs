@@ -11,7 +11,7 @@ from asciireqs.docparser import (
     req_from_yaml_dict,
     req_from_yaml_lines,
 )
-from asciireqs.fields import ID, LINE_NO
+from asciireqs.fields import ID, TEXT, PARENT, CHILD, LINE_NO
 
 
 def row(elements: List[Tuple[str, int]]) -> List[Cell]:
@@ -111,9 +111,9 @@ def test_req_from_single_req_table() -> None:
     assert len(reqs) == 5
     assert reqs == {
         ID: "ID-1",
-        "Parent": "ID-2",
-        "Child": "ID-3",
-        "Text": "Text",
+        PARENT: "ID-2",
+        CHILD: "ID-3",
+        TEXT: "Text",
         LINE_NO: "3",
     }
 
@@ -129,10 +129,10 @@ def test_req_from_single_req_table_with_three_rows() -> None:
     assert len(reqs) == 6
     assert reqs == {
         ID: "ID-1",
-        "Parent": "ID-2",
-        "Child": "ID-3",
+        PARENT: "ID-2",
+        CHILD: "ID-3",
         "Tags": "V.1",
-        "Text": "Text",
+        TEXT: "Text",
         LINE_NO: "3",
     }
 
@@ -163,12 +163,12 @@ def test_req_from_yaml_block_with_empty_input() -> None:
 
 def test_req_from_yaml_block_with_simple_requirement() -> None:
     req = req_from_yaml_dict(["ID: SR-001", "Text: Some requirement"], 13)
-    assert req == {"ID": "SR-001", "Text": "Some requirement", LINE_NO: str(13)}
+    assert req == {ID: "SR-001", TEXT: "Some requirement", LINE_NO: str(13)}
 
 
 def test_req_from_yaml_block_with_id_on_second_line() -> None:
     req = req_from_yaml_dict(["ID: |", "  SR-001", "Text: Some requirement"], 13)
-    assert req == {"ID": "SR-001", "Text": "Some requirement", LINE_NO: str(14)}
+    assert req == {ID: "SR-001", TEXT: "Some requirement", LINE_NO: str(14)}
 
 
 def test_req_from_yaml_lines_with_single_requirement() -> None:
@@ -177,4 +177,12 @@ def test_req_from_yaml_lines_with_single_requirement() -> None:
     req = req_from_yaml_lines(
         enumerate(source_block_marker + source_input + source_block_marker, start=1)
     )
-    assert req == {"ID": "SR-001", "Text": "Some requirement", LINE_NO: str(2)}
+    assert req == {ID: "SR-001", TEXT: "Some requirement", LINE_NO: str(2)}
+
+
+def test_req_from_yaml_with_missing_id() -> None:
+    assert not req_from_yaml_dict(["Text: Some requirement"], 13)
+
+
+def test_req_from_yaml_with_missing_text() -> None:
+    assert not req_from_yaml_dict(["ID: SR-001"], 13)

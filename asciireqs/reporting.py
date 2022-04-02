@@ -4,7 +4,7 @@ import os
 import re
 from typing import Dict, Iterable, List, Optional, Tuple
 
-from asciireqs.fields import ID, LINE_NO, TEXT, PARENT, CHILD
+from asciireqs.fields import ID, LINE_NO, TEXT, CHILD, PARENT
 from asciireqs.docparser import Project, req_from_yaml_lines
 from asciireqs.reqdocument import ReqDocument, Requirement, Requirements
 
@@ -39,13 +39,13 @@ def missing_link_from_parent(requirement: Requirement, project: Project) -> bool
     :param project: The project data model
     :return: True if each parent has a link back to the child
     """
-    if "Parent" not in requirement.keys():
+    if PARENT not in requirement.keys():
         return False
-    for parent_id in split_req_list(requirement["Parent"]):
+    for parent_id in split_req_list(requirement[PARENT]):
         parent_req = project.requirements[parent_id]
-        if "Child" not in parent_req:
+        if CHILD not in parent_req:
             return True
-        parent_children_id = split_req_list(parent_req["Child"])
+        parent_children_id = split_req_list(parent_req[CHILD])
         if not requirement[ID] in parent_children_id:
             return True
     return False
@@ -136,7 +136,8 @@ def line_numbers_for_requirements(requirements: Requirements) -> Dict[int, str]:
 
 def insert_requirement_links(line: str, doc: ReqDocument) -> str:
     """Takes a line of AsciiDoc text and adds cross-links to requirement IDs"""
-    line = re.sub(rf"({doc.req_prefix}\d+)", f"xref:{doc.name}#\\1[\\1]", line)
+    if doc.req_prefix:
+        line = re.sub(rf"({doc.req_prefix}\d+)", f"xref:{doc.name}#\\1[\\1]", line)
     for child_doc in doc.child_docs:
         line = insert_requirement_links(line, child_doc)
     return line
@@ -156,22 +157,23 @@ def insert_anchor(line: str, req_id: str, root_document: ReqDocument) -> str:
     )
 
 
-# ToDo: Unit test and doc
-def requirement_as_term(req: Requirement) -> Iterable[str]:
+def requirement_as_term(req: Requirement, doc: ReqDocument) -> Iterable[str]:
+    """
+    Takes a requirement and outputs AsciiDoc using the 'term' style
+    :param req: The requirement
+    :param doc: The top level document (used to insert requirement links)
+    :return: Lines of AsciiDoc
+    """
     yield "[horizontal]\n"
-    yield req[ID] + ":: " + req[TEXT] + "\n"
+    yield "[[" + req[ID] + "]]" + req[ID] + ":: " + insert_requirement_links(
+        req[TEXT].replace("\n", "\n+\n"), doc
+    ) + "\n"
     yield "+\n"
-    attr_line = ""
-    first = True
-    for attribute, value in req.items():  # ToDo: Comprehension with join
-        if attribute not in (ID, TEXT, LINE_NO):
-            if first:
-                first = False
-            else:
-                attr_line = attr_line + "; "
-            attr_line = attr_line + attribute + ": " + value
-    attr_line += "\n"
-    yield attr_line  # ToDo: Anchors and links
+    yield "; ".join(
+        attribute + ": " + insert_requirement_links(value, doc)
+        for attribute, value in req.items()
+        if attribute not in (ID, TEXT, LINE_NO)
+    ) + "\n"
 
 
 def generate_report_line(
@@ -209,10 +211,14 @@ def generate_report_line(
         elif stripped_line.startswith("[.reqy]"):
             # Consume the listing block of YAML:
             req_from_yaml = req_from_yaml_lines(input_lines)
-            if req_from_yaml and ID in req_from_yaml and req_from_yaml[ID] in requirements:
+            if (
+                req_from_yaml
+                and ID in req_from_yaml
+                and req_from_yaml[ID] in requirements
+            ):
                 # Replace with formatting using "Term":
                 req = requirements[req_from_yaml[ID]]
-                yield from requirement_as_term(req)
+                yield from requirement_as_term(req, project.root_document)
         else:
             if line_no in req_lines:
                 # This line contains a requirement definition which we want to make into an anchor:

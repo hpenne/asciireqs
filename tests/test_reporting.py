@@ -88,10 +88,10 @@ def test_split_req_list() -> None:
 
 def test_missing_link_from_parent_link_ok() -> None:
     ur = ReqDocument()
-    ur.reqs["UR-1"] = {"ID": "UR-1", "Child": "SR-1"}
+    ur.reqs["UR-1"] = {ID: "UR-1", CHILD: "SR-1"}
     sr = ReqDocument()
     ur.child_docs = [sr]
-    sr1 = {"ID": "SR-1", "Parent": "UR-1"}
+    sr1 = {ID: "SR-1", PARENT: "UR-1"}
     sr.reqs["SR-1"] = sr1
     project = Project(ur, {**ur.reqs, **sr.reqs})
     assert not missing_link_from_parent(sr1, project)
@@ -100,10 +100,10 @@ def test_missing_link_from_parent_link_ok() -> None:
 
 def test_missing_link_from_parent_no_downlink() -> None:
     ur = ReqDocument()
-    ur.reqs["UR-1"] = {"ID": "UR-1", "Child": "SR-2"}
+    ur.reqs["UR-1"] = {ID: "UR-1", CHILD: "SR-2"}
     sr = ReqDocument()
     ur.child_docs = [sr]
-    sr1 = {"ID": "SR-1", "Parent": "UR-1"}
+    sr1 = {ID: "SR-1", PARENT: "UR-1"}
     sr.reqs["SR-1"] = sr1
     project = Project(ur, {**ur.reqs, **sr.reqs})
     assert missing_link_from_parent(sr1, project)
@@ -112,11 +112,11 @@ def test_missing_link_from_parent_no_downlink() -> None:
 
 def test_missing_link_from_parent_one_of_two_downlinks_ok() -> None:
     ur = ReqDocument()
-    ur.reqs["UR-1"] = {"ID": "UR-1", "Child": "SR-1"}
-    ur.reqs["UR-2"] = {"ID": "UR-1", "Child": "SR-2"}
+    ur.reqs["UR-1"] = {ID: "UR-1", CHILD: "SR-1"}
+    ur.reqs["UR-2"] = {ID: "UR-1", CHILD: "SR-2"}
     sr = ReqDocument()
     ur.child_docs = [sr]
-    sr1 = {"ID": "SR-1", "Parent": "UR-1, UR-2"}
+    sr1 = {ID: "SR-1", PARENT: "UR-1, UR-2"}
     sr.reqs["SR-1"] = sr1
     project = Project(ur, {**ur.reqs, **sr.reqs})
     assert missing_link_from_parent(sr1, project)
@@ -124,11 +124,11 @@ def test_missing_link_from_parent_one_of_two_downlinks_ok() -> None:
 
 def test_missing_link_from_parent_two_of_two_downlinks_ok() -> None:
     ur = ReqDocument()
-    ur.reqs["UR-1"] = {"ID": "UR-1", "Child": "SR-1"}
-    ur.reqs["UR-2"] = {"ID": "UR-2", "Child": "SR-1"}
+    ur.reqs["UR-1"] = {ID: "UR-1", CHILD: "SR-1"}
+    ur.reqs["UR-2"] = {ID: "UR-2", CHILD: "SR-1"}
     sr = ReqDocument()
     ur.child_docs = [sr]
-    sr1 = {"ID": "SR-1", "Parent": "UR-1, UR-2"}
+    sr1 = {ID: "SR-1", PARENT: "UR-1, UR-2"}
     sr.reqs["SR-1"] = sr1
     project = Project(ur, {**ur.reqs, **sr.reqs})
     assert not missing_link_from_parent(sr1, project)
@@ -141,16 +141,44 @@ def test_missing_link_from_parent_two_of_two_downlinks_ok() -> None:
 
 
 def test_requirement_as_term() -> None:
-    req = {
-        ID: "R-1",
-        TEXT: "Some requirement",
-        PARENT: "UR-1",
-        CHILD: "SR-1, SR-2",
+    ur = ReqDocument()
+    ur.req_prefix = "UR-"
+    ur.name = "ur.adoc"
+    ur.reqs["UR-1"] = {
+        ID: "UR-1",
+        CHILD: "SR-1",
         LINE_NO: "100",
     }
-    lines = list(requirement_as_term(req))
+    sr = ReqDocument()
+    ur.child_docs = [sr]
+    sr.reqs["SR-1"] = {
+        ID: "SR-1",
+        TEXT: "Some requirement",
+        PARENT: "UR-1",
+        CHILD: "R1, R2",
+    }
+
+    lines = list(requirement_as_term(sr.reqs["SR-1"], ur))
     assert len(lines) == 4
     assert lines[0] == "[horizontal]\n"
-    assert lines[1] == "R-1:: Some requirement\n"
+    assert lines[1] == "[[SR-1]]SR-1:: Some requirement\n"
     assert lines[2] == "+\n"
-    assert lines[3] == "Parent: UR-1; Child: SR-1, SR-2\n"
+    assert lines[3] == "Parent: xref:ur.adoc#UR-1[UR-1]; Child: R1, R2\n"
+
+
+def test_requirement_as_term_with_multiline_text() -> None:
+    ur = ReqDocument()
+    ur.name = "ur.adoc"
+    ur.reqs["UR-1"] = {
+        ID: "UR-1",
+        TEXT: "This is line 1\nand this is line two",
+        CHILD: "SR-1",
+        LINE_NO: "100",
+    }
+
+    lines = list(requirement_as_term(ur.reqs["UR-1"], ur))
+    assert len(lines) == 4
+    assert lines[0] == "[horizontal]\n"
+    assert lines[1] == "[[UR-1]]UR-1:: This is line 1\n+\nand this is line two\n"
+    assert lines[2] == "+\n"
+    assert lines[3] == "Child: SR-1\n"

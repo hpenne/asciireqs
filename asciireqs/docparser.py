@@ -7,7 +7,7 @@ from dataclasses import dataclass
 from typing import Iterable, List, Optional, Tuple
 import yaml
 
-from asciireqs import fields
+from asciireqs.fields import ID, TEXT, LINE_NO
 from asciireqs.reqdocument import ReqDocument, Requirement, Requirements
 
 
@@ -163,7 +163,7 @@ def reqs_from_req_table(heading: Row, table_rows: Table) -> Iterable[Requirement
     if table_rows:
         for row in table_rows:
             req = {heading[i].data: cell.data for (i, cell) in enumerate(row)}
-            req[fields.LINE_NO] = str(row[0].location.line)
+            req[LINE_NO] = str(row[0].location.line)
             yield req
 
 
@@ -171,14 +171,14 @@ def req_from_single_req_table(table_lines: Table) -> Optional[Requirement]:
     """Takes a table form and returns the single requirement in it"""
     # First cell should be requirement ID
     req = {
-        fields.ID: table_lines[0][0].data,
-        fields.LINE_NO: str(table_lines[0][0].location.line),
+        ID: table_lines[0][0].data,
+        LINE_NO: str(table_lines[0][0].location.line),
     }
     for cell in sum(table_lines, [])[1:]:
         if cell:
             parts = [part.strip() for part in cell.data.split(":")]
             if len(parts) == 1:
-                if "Text" in req:
+                if TEXT in req:
                     if not cell.empty():
                         print(
                             (
@@ -188,7 +188,7 @@ def req_from_single_req_table(table_lines: Table) -> Optional[Requirement]:
                         )
                         return None
                 else:
-                    req["Text"] = parts[0]
+                    req[TEXT] = parts[0]
             else:
                 if parts[0]:
                     req[parts[0]] = parts[1]
@@ -206,18 +206,21 @@ def req_from_yaml_dict(lines: List[str], line_no: int) -> Optional[Requirement]:
     if not attributes:
         print(f"Error: Failed to parse YAML on line {line_no}")
         return None
-    if fields.ID not in attributes:
+    if ID not in attributes:
         print(f"Error: Missing ID attribute on line {line_no}")
+        return None
+    if TEXT not in attributes:
+        print(f"Error: Missing Text attribute on line {line_no}")
         return None
     req = {}
     for name, value in attributes.items():
         req[name] = str(value).strip(" \n")
 
     # The line number must be the line the ID is on, so we need to search for it:
-    req_id = req[fields.ID]
+    req_id = req[ID]
     for id_line_no, line in enumerate(lines, start=line_no):
         if line.find(req_id) >= 0:
-            req[fields.LINE_NO] = str(id_line_no)
+            req[LINE_NO] = str(id_line_no)
     return req
 
 
@@ -242,16 +245,33 @@ def get_attribute(line: str, name: str) -> Optional[str]:
     return None
 
 
+def heading_names(heading: Row) -> list[str]:
+    """Takes a list of heading cells and returns the heading names"""
+    return [cell.data for cell in heading]
+
+
+def heading_has_required_fields(heading: Row, line_no: int) -> bool:
+    """Takes a list of heading cells and checks it contains columns for ID and Text"""
+    names = heading_names(heading)
+    if ID not in names:
+        print(f"Error: Table must contain a column named '{ID}' on line {line_no}")
+        return False
+    if TEXT not in names:
+        print(f"Error: Table must contain a column named '{TEXT}' on line {line_no}")
+        return False
+    return True
+
+
 def parse_doc(lines: Iterable[Tuple[int, str]]) -> ReqDocument:
     """Parses lines of AsciiDoc text and returns a ReqDocument with all the requirements etc."""
     doc = ReqDocument()
-    for _, text in lines:
+    for line_no, text in lines:
         text = text.rstrip()
         if text == "[.reqs]":
             heading, rows = get_table(lines)
-            if heading and rows:
+            if heading and rows and heading_has_required_fields(heading, line_no):
                 doc.add_reqs(reqs_from_req_table(heading, rows))
-                doc.add_keys([cell.data for cell in heading])  # pylint: disable=E1133
+                doc.add_keys(heading_names(heading))
         elif text == "[.req]":
             heading, rows = get_table(lines)
             if rows:
