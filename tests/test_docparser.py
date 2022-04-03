@@ -8,8 +8,8 @@ from asciireqs.docparser import (
     reqs_from_req_table,
     req_from_single_req_table,
     get_source_block,
-    req_from_yaml_dict,
     req_from_yaml_lines,
+    req_from_yaml_block,
     get_cols_from_attribute,
     validate_requirement,
 )
@@ -139,7 +139,9 @@ def test_validate_requirement_no_id_field() -> None:
 
 
 def test_validate_requirement_wrong_id_prefix() -> None:
-    assert not validate_requirement({ID: "S-1", TEXT: "Some text"}, doc_with_req_prefix(), 2)
+    assert not validate_requirement(
+        {ID: "S-1", TEXT: "Some text"}, doc_with_req_prefix(), 2
+    )
 
 
 def test_validate_requirement_no_text_field() -> None:
@@ -150,7 +152,10 @@ def test_validate_requirement_no_text_field() -> None:
 
 def test_reqs_from_reqtable() -> None:
     heading = row([(ID, 2), (TEXT, 2), ("A", 2)])
-    rows = [row([("SR-1", 3), ("B", 3), ("C", 3)]), row([("SR-2", 4), ("E", 4), ("F", 4)])]
+    rows = [
+        row([("SR-1", 3), ("B", 3), ("C", 3)]),
+        row([("SR-2", 4), ("E", 4), ("F", 4)]),
+    ]
     reqs = list(reqs_from_req_table(heading, rows, doc_with_req_prefix()))
     assert reqs
     assert len(reqs) == 2
@@ -232,35 +237,65 @@ def test_get_source_block() -> None:
 
 
 def test_req_from_yaml_block_with_empty_input() -> None:
-    assert not req_from_yaml_dict([], 13)
+    assert not req_from_yaml_lines([], doc_with_req_prefix(), 13)
 
 
 def test_req_from_yaml_block_with_simple_requirement() -> None:
-    req = req_from_yaml_dict(["ID: SR-001", "Text: Some requirement"], 13)
-    assert req == {ID: "SR-001", TEXT: "Some requirement", LINE_NO: str(13)}
+    req = req_from_yaml_lines(
+        ["ID: SR-001", "Text: Some requirement"], doc_with_req_prefix(), 13
+    )
+    assert len(req) == 1
+    assert req[0] == {ID: "SR-001", TEXT: "Some requirement", LINE_NO: str(13)}
 
 
 def test_req_from_invalid_yaml_block() -> None:
-    assert not req_from_yaml_dict(["ID SR-001", "Text: Some requirement"], 13)
+    assert not req_from_yaml_lines(
+        ["ID SR-001", "Text: Some requirement"], doc_with_req_prefix(), 13
+    )
 
 
 def test_req_from_yaml_block_with_id_on_second_line() -> None:
-    req = req_from_yaml_dict(["ID: |", "  SR-001", "Text: Some requirement"], 13)
-    assert req == {ID: "SR-001", TEXT: "Some requirement", LINE_NO: str(14)}
+    req = req_from_yaml_lines(
+        ["ID: |", "  SR-001", "Text: Some requirement"], doc_with_req_prefix(), 13
+    )
+    assert len(req) == 1
+    assert req[0] == {ID: "SR-001", TEXT: "Some requirement", LINE_NO: str(14)}
 
 
 def test_req_from_yaml_lines_with_single_requirement() -> None:
     source_input = ["ID: SR-001", "Text: Some requirement"]
     source_block_marker = ["----"]
-    req = req_from_yaml_lines(
-        enumerate(source_block_marker + source_input + source_block_marker, start=1)
+    req = req_from_yaml_block(
+        enumerate(source_block_marker + source_input + source_block_marker, start=1),
+        doc_with_req_prefix(),
     )
-    assert req == {ID: "SR-001", TEXT: "Some requirement", LINE_NO: str(2)}
+    assert len(req) == 1
+    assert req[0] == {ID: "SR-001", TEXT: "Some requirement", LINE_NO: str(2)}
+
+
+def test_req_from_yaml_lines_with_two_requirement() -> None:
+    source_input = [
+        "SR-001:",
+        "  Text: Some requirement",
+        "SR-002:",
+        "  Text: Some other requirement",
+    ]
+    source_block_marker = ["----"]
+    reqs = req_from_yaml_block(
+        enumerate(source_block_marker + source_input + source_block_marker, start=1),
+        doc_with_req_prefix(),
+    )
+    assert reqs == [
+        {ID: "SR-001", TEXT: "Some requirement", LINE_NO: str(2)},
+        {ID: "SR-002", TEXT: "Some other requirement", LINE_NO: str(4)},
+    ]
 
 
 def test_req_from_yaml_with_missing_id() -> None:
-    assert not req_from_yaml_dict(["Text: Some requirement"], 13)
+    assert not req_from_yaml_lines(
+        ["Text: Some requirement"], doc_with_req_prefix(), 13
+    )
 
 
 def test_req_from_yaml_with_missing_text() -> None:
-    assert not req_from_yaml_dict(["ID: SR-001"], 13)
+    assert not req_from_yaml_lines(["ID: SR-001"], doc_with_req_prefix(), 13)

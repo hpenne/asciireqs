@@ -166,16 +166,16 @@ def validate_requirement(req: Requirement, doc: ReqDocument, line_no: int) -> bo
     """Takes a Requirement and verifies that it contains the required attributes"""
     if not doc.req_prefix:
         print("Error: Document has no req-prefix attribute")
-        return None
+        return False
     if ID not in req:
         print(f"Error: Missing ID attribute on line {line_no}")
-        return None
+        return False
     if TEXT not in req:
         print(f"Error: Missing Text attribute on line {line_no}")
-        return None
+        return False
     if not req[ID].startswith(doc.req_prefix):
         print(f"Error: Wrong ID format on line {line_no}")
-        return None
+        return False
     return True
 
 
@@ -193,9 +193,10 @@ def reqs_from_req_table(heading: Row, table_rows: Table, doc: ReqDocument) -> It
 def req_from_single_req_table(table_lines: Table, doc: ReqDocument) -> Optional[Requirement]:
     """Takes a table form and returns the single requirement in it"""
     # First cell should be requirement ID
+    line_no = table_lines[0][0].location.line
     req = {
         ID: table_lines[0][0].data,
-        LINE_NO: str(table_lines[0][0].location.line),
+        LINE_NO: str(line_no),
     }
     for cell in sum(table_lines, [])[1:]:
         if cell:
@@ -220,48 +221,56 @@ def req_from_single_req_table(table_lines: Table, doc: ReqDocument) -> Optional[
                         f"Error in single req. table: Property name not found: {cell}"
                     )
                     return None
-    return req if validate_requirement(req, doc, req[LINE_NO]) else None
+    return req if validate_requirement(req, doc, line_no) else None
 
 
-def req_from_yaml_dict(lines: List[str], line_no: int) -> Optional[Requirement]:
-    """Takes a list of YAML source lines and returns a requirement"""
+def req_from_yaml_lines(lines: List[str], doc: ReqDocument, line_no: int) -> List[Requirement]:
+    """Takes a list of YAML source lines and returns the requirement therein"""
     try:
         attributes = yaml.safe_load("\n".join(lines))
     except ScannerError:
         print(f"Error: Failed to parse YAML on line {line_no}")
-        return None
+        return []
     if not attributes:
         print(f"Error: Failed to parse YAML on line {line_no}")
-        return None
-    if ID not in attributes:
-        print(f"Error: Missing ID attribute on line {line_no}")
-        return None
-    if TEXT not in attributes:
-        print(f"Error: Missing Text attribute on line {line_no}")
-        return None
-    req = {}
-    for name, value in attributes.items():
-        req[name] = str(value).strip(" \n")
+        return []
+
+    reqs = []
+    if next(iter(attributes.keys())).startswith(doc.req_prefix):
+        # This is dict of requirements:
+        for req_id, attrs in attributes.items():
+            req = {name: str(value).strip(" \n") for name, value in attrs.items()}
+            req[ID] = req_id
+            if validate_requirement(req, doc, line_no):
+                reqs += [req]
+    else:
+        # This must be a single requirement:
+        req = {}
+        for name, value in attributes.items():
+            req[name] = str(value).strip(" \n")
+        if validate_requirement(req, doc, line_no):
+            reqs = [req]
 
     # The line number must be the line the ID is on, so we need to search for it:
-    req_id = req[ID]
-    for id_line_no, line in enumerate(lines, start=line_no):
-        if line.find(req_id) >= 0:
-            req[LINE_NO] = str(id_line_no)
-    return req
+    for req in reqs:
+        req_id = req[ID]
+        for id_line_no, line in enumerate(lines, start=line_no):
+            if line.find(req_id) >= 0:
+                req[LINE_NO] = str(id_line_no)
+    return reqs
 
 
-def req_from_yaml_lines(lines: Iterable[Tuple[int, str]]) -> Optional[Requirement]:
+def req_from_yaml_block(lines: Iterable[Tuple[int, str]], doc: ReqDocument) -> List[Requirement]:
     """
     Takes AsciiDoc lines of text (starting with a source block), consumes the source block
-    lines, converts to YAML and returns the requirement defined by the YAML
+    lines, converts to YAML and returns the requirements defined by the YAML
     :param lines: The input lines
-    :return: The requirement (or None if not found)
+    :return: The requirements
     """
     yaml_lines, start_line_no = get_source_block(lines)
     if yaml_lines:
-        return req_from_yaml_dict(yaml_lines, start_line_no)
-    return None
+        return req_from_yaml_lines(yaml_lines, doc, start_line_no)
+    return []
 
 
 def get_attribute(line: str, name: str) -> Optional[str]:
@@ -307,8 +316,7 @@ def parse_doc(lines: Iterable[Tuple[int, str]]) -> ReqDocument:
                     doc.add_keys(list(req.keys()))
                     doc.add_req(req)
         elif text == "[.reqy]":
-            req = req_from_yaml_lines(lines)
-            if req:
+            for req in req_from_yaml_block(lines, doc):
                 doc.add_keys(list(req.keys()))
                 doc.add_req(req)
         else:

@@ -5,7 +5,7 @@ import re
 from typing import Dict, Iterable, List, Optional, Tuple
 
 from asciireqs.fields import ID, LINE_NO, TEXT, CHILD, PARENT
-from asciireqs.docparser import Project, req_from_yaml_lines
+from asciireqs.docparser import Project, req_from_yaml_block
 from asciireqs.reqdocument import ReqDocument, Requirement, Requirements
 
 
@@ -179,6 +179,7 @@ def generate_report_line(
     input_lines: Iterable[Tuple[int, str]],
     project: Project,
     requirements: Requirements,
+    doc: Optional[ReqDocument],
     req_lines: Dict[int, str],
 ) -> Iterable[str]:
     """
@@ -188,6 +189,7 @@ def generate_report_line(
     :param input_lines: The input text
     :param project: The project data model
     :param requirements: The requirements of the current document
+    :param doc: The current document. None if the document is a template (not a specification)
     :param req_lines: The lines numbers where the document's requirements are defined
     :return: The generated AsciiDoc text
     """
@@ -206,17 +208,13 @@ def generate_report_line(
                 project, requirements, field_names, filter_expression
             ):
                 yield line
-        elif stripped_line.startswith("[.reqy]"):
+        elif stripped_line.startswith("[.reqy]") and doc:
             # Consume the listing block of YAML:
-            req_from_yaml = req_from_yaml_lines(input_lines)
-            if (
-                req_from_yaml
-                and ID in req_from_yaml
-                and req_from_yaml[ID] in requirements
-            ):
-                # Replace with formatting using "Term":
-                req = requirements[req_from_yaml[ID]]
-                yield from requirement_as_term(req, project.root_document)
+            for yaml_req in req_from_yaml_block(input_lines, doc):
+                if ID in yaml_req and yaml_req[ID] in doc.reqs:
+                    # Replace with formatting using "Term":
+                    doc_req = doc.reqs[yaml_req[ID]]
+                    yield from requirement_as_term(doc_req, project.root_document)
         else:
             if line_no in req_lines:
                 # This line contains a requirement definition which we want to make into an anchor:
@@ -248,6 +246,7 @@ def post_process_hierarchically(
                 enumerate(input_file, start=1),
                 project,
                 document.reqs,
+                document,
                 requirement_lines,
             ):
                 output_file.write(line)
