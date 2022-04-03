@@ -40,7 +40,7 @@ def test_line_numbers_for_requirements() -> None:
 
 
 def test_get_spec_hierarchy() -> None:
-    lines = get_spec_hierarchy(docs_with_req_prefix(), "")
+    lines = list(get_spec_hierarchy(docs_with_req_prefix(), ""))
     assert len(lines) == 3
     assert lines[0] == "* ur-reqs.adoc\n"
     assert lines[1] == "** sw-reqs.adoc\n"

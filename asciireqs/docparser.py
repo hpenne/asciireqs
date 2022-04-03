@@ -6,6 +6,7 @@ from copy import copy
 from dataclasses import dataclass
 from typing import Iterable, List, Optional, Tuple
 import yaml
+from yaml.scanner import ScannerError
 
 from asciireqs.fields import ID, TEXT, LINE_NO
 from asciireqs.reqdocument import ReqDocument, Requirement, Requirements
@@ -70,7 +71,10 @@ def get_cols_from_attribute(line: str, line_no: int) -> Optional[int]:
     bracket_pos = line.find("]")
     if 0 <= eq_pos < bracket_pos:
         num_str = line[eq_pos + 1 : bracket_pos]
-        return int(num_str)
+        try:
+            return int(num_str)
+        except ValueError:
+            pass
     print(f"Error on line {line_no}, failed to parse number of columns: {line}")
     return None
 
@@ -158,16 +162,35 @@ def get_source_block(lines: Iterable[Tuple[int, str]]) -> Tuple[List[str], int]:
     return [], 0
 
 
-def reqs_from_req_table(heading: Row, table_rows: Table) -> Iterable[Requirement]:
+def validate_requirement(req: Requirement, doc: ReqDocument, line_no: int) -> bool:
+    """Takes a Requirement and verifies that it contains the required attributes"""
+    if not doc.req_prefix:
+        print("Error: Document has no req-prefix attribute")
+        return None
+    if ID not in req:
+        print(f"Error: Missing ID attribute on line {line_no}")
+        return None
+    if TEXT not in req:
+        print(f"Error: Missing Text attribute on line {line_no}")
+        return None
+    if not req[ID].startswith(doc.req_prefix):
+        print(f"Error: Wrong ID format on line {line_no}")
+        return None
+    return True
+
+
+def reqs_from_req_table(heading: Row, table_rows: Table, doc: ReqDocument) -> Iterable[Requirement]:
     """Takes a table and returns the requirements in it"""
     if table_rows:
         for row in table_rows:
             req = {heading[i].data: cell.data for (i, cell) in enumerate(row)}
-            req[LINE_NO] = str(row[0].location.line)
-            yield req
+            line_no = row[0].location.line
+            req[LINE_NO] = str(line_no)
+            if validate_requirement(req, doc, line_no):
+                yield req
 
 
-def req_from_single_req_table(table_lines: Table) -> Optional[Requirement]:
+def req_from_single_req_table(table_lines: Table, doc: ReqDocument) -> Optional[Requirement]:
     """Takes a table form and returns the single requirement in it"""
     # First cell should be requirement ID
     req = {
@@ -197,12 +220,16 @@ def req_from_single_req_table(table_lines: Table) -> Optional[Requirement]:
                         f"Error in single req. table: Property name not found: {cell}"
                     )
                     return None
-    return req
+    return req if validate_requirement(req, doc, req[LINE_NO]) else None
 
 
 def req_from_yaml_dict(lines: List[str], line_no: int) -> Optional[Requirement]:
     """Takes a list of YAML source lines and returns a requirement"""
-    attributes = yaml.safe_load("\n".join(lines))
+    try:
+        attributes = yaml.safe_load("\n".join(lines))
+    except ScannerError:
+        print(f"Error: Failed to parse YAML on line {line_no}")
+        return None
     if not attributes:
         print(f"Error: Failed to parse YAML on line {line_no}")
         return None
@@ -270,12 +297,12 @@ def parse_doc(lines: Iterable[Tuple[int, str]]) -> ReqDocument:
         if text == "[.reqs]":
             heading, rows = get_table(lines)
             if heading and rows and heading_has_required_fields(heading, line_no):
-                doc.add_reqs(reqs_from_req_table(heading, rows))
+                doc.add_reqs(reqs_from_req_table(heading, rows, doc))
                 doc.add_keys(heading_names(heading))
         elif text == "[.req]":
             heading, rows = get_table(lines)
             if rows:
-                req = req_from_single_req_table(rows)
+                req = req_from_single_req_table(rows, doc)
                 if req:
                     doc.add_keys(list(req.keys()))
                     doc.add_req(req)

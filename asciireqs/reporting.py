@@ -9,13 +9,12 @@ from asciireqs.docparser import Project, req_from_yaml_lines
 from asciireqs.reqdocument import ReqDocument, Requirement, Requirements
 
 
-def get_spec_hierarchy(doc: ReqDocument, preamble: str) -> List[str]:
+def get_spec_hierarchy(doc: ReqDocument, preamble: str) -> Iterable[str]:
     """Takes a ReqDocument and a hierarchical document list for that document and its children"""
     preamble = preamble + "*"
-    text: List[str] = [f"{preamble} {doc.name}\n"]
+    yield f"{preamble} {doc.name}\n"
     for sub_doc in doc.child_docs:
-        text += get_spec_hierarchy(sub_doc, preamble)
-    return text
+        yield from get_spec_hierarchy(sub_doc, preamble)
 
 
 def has_element(field_text: str, sub_str: str) -> bool:
@@ -195,8 +194,7 @@ def generate_report_line(
     for line_no, input_line in input_lines:
         stripped_line: str = input_line.strip()
         if stripped_line == "`asciireq-hierarchy`":
-            for line in get_spec_hierarchy(project.root_document, ""):
-                yield line
+            yield from get_spec_hierarchy(project.root_document, "")
         elif stripped_line.startswith("`asciireq-table:") and stripped_line.endswith(
             "`"
         ):
