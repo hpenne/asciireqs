@@ -2,4 +2,4 @@
 
 
 def main() -> None:
-    pass
+    """Init function"""
