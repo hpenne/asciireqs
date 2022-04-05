@@ -275,7 +275,7 @@ To process the specs, run the following command inside the `testdata` folder:
 
 [source, bash]
 ----
-asciireq.py -o ../output -t report-template req-tool-user-reqs.adoc
+asciireq -o ../output -t report-template req-tool-user-reqs.adoc
 ----
 
 This processes both specs (since they form a hierarchy) and puts the processed AsciiDoc files in the output folder.
