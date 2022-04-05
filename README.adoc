@@ -180,6 +180,7 @@ The following property names are treated specially by asciireqs:
 * ID: The requirement identifier
 * Child: The value is interpreted as a comma separated list of requirement identifiers for child requirements in a sub specification (links from a high level requirement to requirement further down in the specification hierarchy)
 * Parent: The value is interpreted as a comma separated list of requirement identifiers linking up to parent requirements higher in the hierarchy.
+* Line: This attribute is set by asciireqs to the line number where the requirement was found.
 
 ==== Child specifications
 

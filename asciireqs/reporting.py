@@ -156,7 +156,7 @@ def get_table(
             if evaluate_requirement_against_filter(req, project, filter_expression):
                 line = table_line(req, attribute_names)
                 if line:
-                    table.append(line)
+                    table.append(insert_requirement_links(line, project.root_document))
         table.append("|===\n")
         return table
     except NameError as exception:

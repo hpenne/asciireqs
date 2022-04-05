@@ -10,33 +10,33 @@
 |===
 |ID |Text |Tags 
 
-|UR-RMS-REQ-011
+|xref:req-tool-user-reqs.adoc#UR-RMS-REQ-011[UR-RMS-REQ-011]
 |The SW shall support an internally hosted central data store.
 |Rel-1
 
-|UR-RMS-REQ-021
+|xref:req-tool-user-reqs.adoc#UR-RMS-REQ-021[UR-RMS-REQ-021]
 |The SW shall support hierarchical specifications documents, and links between parent and child requirements.
 |Rel-1
 
-|UR-RMS-REQ-031
+|xref:req-tool-user-reqs.adoc#UR-RMS-REQ-031[UR-RMS-REQ-031]
 |The SW shall support exporting requirements tables to other formats
 |Rel-1
 
-|SW-RMS-REQ-011
+|xref:req-tool-sw-reqs.adoc#SW-RMS-REQ-011[SW-RMS-REQ-011]
 |The requirements shall be stored an asciidoc text files, for storage in a configuration management system like git.
 |Rel-1
 
-|SW-RMS-REQ-021
+|xref:req-tool-sw-reqs.adoc#SW-RMS-REQ-021[SW-RMS-REQ-021]
 |An attribute for child documents shall be used to define the link between a parent and child specification document.
 
 The attribute shall be on the form `:req-children: name.adoc`
 |Rel-1
 
-|SW-RMS-REQ-022
+|xref:req-tool-sw-reqs.adoc#SW-RMS-REQ-022[SW-RMS-REQ-022]
 |The SW shall insert AsciiDoc anchors for the requirement definition and cross-links where they are referenced
 |Rel-1
 
-|SW-RMS-REQ-031
+|xref:req-tool-sw-reqs.adoc#SW-RMS-REQ-031[SW-RMS-REQ-031]
 |The SW shall support exporting the requirements from a document to CVS format.
 |Rel-1
 
@@ -45,11 +45,12 @@ The attribute shall be on the form `:req-children: name.adoc`
 == Requirements with broken links:
 
 |===
-|ID |Text |Tags 
+|ID |Line |Parent |Child 
 
-|UR-RMS-REQ-032
-|The SW shall support analysis of requirements links between parent and child.
-|Rel-2
+|xref:req-tool-user-reqs.adoc#UR-RMS-REQ-032[UR-RMS-REQ-032]
+|76
+|
+|xref:req-tool-sw-reqs.adoc#SW-RMS-REQ-033[SW-RMS-REQ-033], xref:req-tool-sw-reqs.adoc#SW-RMS-REQ-034[SW-RMS-REQ-034], SW-RMS-RE-999
 
 |===
 
@@ -58,15 +59,15 @@ The attribute shall be on the form `:req-children: name.adoc`
 |===
 |ID |Text |Tags 
 
-|SW-RMS-REQ-011
+|xref:req-tool-sw-reqs.adoc#SW-RMS-REQ-011[SW-RMS-REQ-011]
 |The requirements shall be stored an asciidoc text files, for storage in a configuration management system like git.
 |Rel-1
 
-|SW-RMS-REQ-022
+|xref:req-tool-sw-reqs.adoc#SW-RMS-REQ-022[SW-RMS-REQ-022]
 |The SW shall insert AsciiDoc anchors for the requirement definition and cross-links where they are referenced
 |Rel-1
 
-|SW-RMS-REQ-035
+|xref:req-tool-sw-reqs.adoc#SW-RMS-REQ-035[SW-RMS-REQ-035]
 |The SW shall be able to generate a report table that lists requirements that have inconsistent parent/child relationships (linked in only one direction).
 |Rel-2
 

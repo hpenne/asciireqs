@@ -10,7 +10,7 @@
 
 == Requirements with broken links:
 
-`asciireq-table: ID, Text, Tags; has_invalid_link()`
+`asciireq-table: ID, Line, Parent, Child; has_invalid_link()`
 
 == Requirements with missing links from parent
 

@@ -1,7 +1,7 @@
 """fields - Contains constants for field names"""
 
 ID = "ID"
-LINE_NO = "_line"
+LINE_NO = "Line"
 TEXT = "Text"
 PARENT = "Parent"
 CHILD = "Child"
