@@ -165,7 +165,7 @@ def requirement_as_term(req: Requirement, doc: ReqDocument) -> Iterable[str]:
     """
     yield "[horizontal]\n"
     yield "[[" + req[ID] + "]]" + req[ID] + ":: " + insert_requirement_links(
-        req[TEXT].replace("\n", "\n+\n"), doc
+        req[TEXT].replace("\n\n", "\n+\n"), doc
     ) + "\n"
     yield "+\n"
     yield "; ".join(

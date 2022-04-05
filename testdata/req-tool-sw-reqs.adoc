@@ -40,6 +40,7 @@ Parent: UR-RMS-REQ-021
 Tags: Rel-1
 Text: |
   An attribute for child documents shall be used to define the link between a parent and child specification document.
+
   The attribute shall be on the form `:req-children: name.adoc`
 ----
 

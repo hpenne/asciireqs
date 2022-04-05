@@ -151,6 +151,27 @@ Child: SW-RMS-021; Tags: V.1
 
 This is different from using tables, where the only modification made during processing is to insert anchors and cross-links for the requirement IDs.
 
+It is also possible to define several requirements in one YAML block using a slightly different format:
+
+[source, asciidoc]
+-----
+[.reqy]
+----
+UR-RMS-021:
+  Child: SW-RMS-021
+  Tags: V.1
+  Text: This is the text that defines the requirement
+UR-RMS-022:
+  Child: SW-RMS-022
+  Tags: V.1
+  Text: |
+    This is the text for the second requirement
+    The vertical bar lets you write multi-line YAML texts
+----
+-----
+
+The "Text" field for the second requirement will be split across two lines in the AsciiDoc output.  Using an empty line between them will make them different paragraphs.
+
 ==== Requirement properties
 
 The requirements consist of named properties with values.

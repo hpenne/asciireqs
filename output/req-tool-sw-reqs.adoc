@@ -97,6 +97,7 @@ Parent: xref:req-tool-user-reqs.adoc#UR-RMS-REQ-021[UR-RMS-REQ-021]; Tags: Rel-1
 
 |SW-RMS-REQ-021
 |An attribute for child documents shall be used to define the link between a parent and child specification document.
+
 The attribute shall be on the form `:req-children: name.adoc`
 |Rel-1
 

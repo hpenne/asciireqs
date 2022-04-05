@@ -171,7 +171,7 @@ def test_requirement_as_term_with_multiline_text() -> None:
     ur.name = "ur.adoc"
     ur.reqs["UR-1"] = {
         ID: "UR-1",
-        TEXT: "This is line 1\nand this is line two",
+        TEXT: "This is paragraph one\n\nand this is paragraph two",
         CHILD: "SR-1",
         LINE_NO: "100",
     }
@@ -179,6 +179,6 @@ def test_requirement_as_term_with_multiline_text() -> None:
     lines = list(requirement_as_term(ur.reqs["UR-1"], ur))
     assert len(lines) == 4
     assert lines[0] == "[horizontal]\n"
-    assert lines[1] == "[[UR-1]]UR-1:: This is line 1\n+\nand this is line two\n"
+    assert lines[1] == "[[UR-1]]UR-1:: This is paragraph one\n+\nand this is paragraph two\n"
     assert lines[2] == "+\n"
     assert lines[3] == "Child: SR-1\n"
