@@ -42,6 +42,17 @@ The attribute shall be on the form `:req-children: name.adoc`
 
 |===
 
+== Requirements with broken links:
+
+|===
+|ID |Text |Tags 
+
+|UR-RMS-REQ-032
+|The SW shall support analysis of requirements links between parent and child.
+|Rel-2
+
+|===
+
 == Requirements with missing links from parent
 
 |===

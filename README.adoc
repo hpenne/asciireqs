@@ -260,6 +260,8 @@ The following helper functions are defined (comparisons can also be used):
 
 * has_element: This takes a requirement property value as the first argument and a target string as the second, and returns true if the target string is found in the property value.
 
+* has_invalid_link: The is true if the Parent or Child attribute contains an unknown requirement ID.
+
 * link_error: This true if the requirement has a link to one or more parents, where the parent has no link back to the requirement.
 This is useful to generate tables of requirements with broken/inconsistent links.
 

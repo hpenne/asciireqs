@@ -30,6 +30,40 @@ def split_req_list(req_list: str) -> List[str]:
     return [req.strip() for req in req_list.split(",") if req]
 
 
+def invalid_link_in_attribute(
+    attribute: str, requirement: Requirement, project: Project
+) -> bool:
+    """
+    Returns True if the requirement attribute contains an unknown requirement ID
+    :param attribute: The attribute name
+    :param requirement: The requirement
+    :param project: The project object
+    :return: True if an ID is unknown
+    """
+    if attribute not in requirement:
+        return False
+    return any(
+        (
+            req_id not in project.requirements
+            for req_id in split_req_list(requirement[attribute])
+        )
+    )
+
+
+def one_or_more_req_links_is_invalid(
+    requirement: Requirement, project: Project
+) -> bool:
+    """
+    Returns True if the Parent or Child attributes contain an unknown requirement ID
+    :param requirement: The requirement
+    :param project: The project object
+    :return: True if an ID is unknown
+    """
+    return invalid_link_in_attribute(
+        CHILD, requirement, project
+    ) or invalid_link_in_attribute(PARENT, requirement, project)
+
+
 def missing_link_from_parent(requirement: Requirement, project: Project) -> bool:
     """
     Checks if the parent-child links for a requirement goes both ways consistently.
@@ -64,7 +98,15 @@ def evaluate_requirement_against_filter(
     def link_error() -> bool:
         return missing_link_from_parent(req, project)
 
-    allowed_names = {"req": req, "has_element": has_element, "link_error": link_error}
+    def has_invalid_link() -> bool:
+        return one_or_more_req_links_is_invalid(req, project)
+
+    allowed_names = {
+        "req": req,
+        "has_element": has_element,
+        "has_invalid_link": has_invalid_link,
+        "link_error": link_error,
+    }
     code = compile(filter_expression, "<string>", "eval")
     for name in code.co_names:
         if name not in allowed_names:

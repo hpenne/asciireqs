@@ -179,7 +179,9 @@ def validate_requirement(req: Requirement, doc: ReqDocument, line_no: int) -> bo
     return True
 
 
-def reqs_from_req_table(heading: Row, table_rows: Table, doc: ReqDocument) -> Iterable[Requirement]:
+def reqs_from_req_table(
+    heading: Row, table_rows: Table, doc: ReqDocument
+) -> Iterable[Requirement]:
     """Takes a table and returns the requirements in it"""
     if table_rows:
         for row in table_rows:
@@ -190,7 +192,9 @@ def reqs_from_req_table(heading: Row, table_rows: Table, doc: ReqDocument) -> It
                 yield req
 
 
-def req_from_single_req_table(table_lines: Table, doc: ReqDocument) -> Optional[Requirement]:
+def req_from_single_req_table(
+    table_lines: Table, doc: ReqDocument
+) -> Optional[Requirement]:
     """Takes a table form and returns the single requirement in it"""
     # First cell should be requirement ID
     line_no = table_lines[0][0].location.line
@@ -224,7 +228,9 @@ def req_from_single_req_table(table_lines: Table, doc: ReqDocument) -> Optional[
     return req if validate_requirement(req, doc, line_no) else None
 
 
-def req_from_yaml_lines(lines: List[str], doc: ReqDocument, line_no: int) -> List[Requirement]:
+def req_from_yaml_lines(
+    lines: List[str], doc: ReqDocument, line_no: int
+) -> List[Requirement]:
     """Takes a list of YAML source lines and returns the requirement therein"""
     try:
         attributes = yaml.safe_load("\n".join(lines))
@@ -260,7 +266,9 @@ def req_from_yaml_lines(lines: List[str], doc: ReqDocument, line_no: int) -> Lis
     return reqs
 
 
-def req_from_yaml_block(lines: Iterable[Tuple[int, str]], doc: ReqDocument) -> List[Requirement]:
+def req_from_yaml_block(
+    lines: Iterable[Tuple[int, str]], doc: ReqDocument
+) -> List[Requirement]:
     """
     Takes AsciiDoc lines of text (starting with a source block), consumes the source block
     lines, converts to YAML and returns the requirements defined by the YAML

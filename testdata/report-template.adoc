@@ -8,6 +8,10 @@
 
 `asciireq-table: ID, Text, Tags; has_element(req["Tags"], "Rel-1")`
 
+== Requirements with broken links:
+
+`asciireq-table: ID, Text, Tags; has_invalid_link()`
+
 == Requirements with missing links from parent
 
 `asciireq-table: ID, Text, Tags; link_error()`

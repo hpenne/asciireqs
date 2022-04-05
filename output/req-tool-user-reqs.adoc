@@ -76,7 +76,7 @@ This is a requirement table:
 |[[UR-RMS-REQ-032]]UR-RMS-REQ-032
 |The SW shall support analysis of requirements links between parent and child.
 |Rel-2
-|xref:req-tool-sw-reqs.adoc#SW-RMS-REQ-033[SW-RMS-REQ-033], xref:req-tool-sw-reqs.adoc#SW-RMS-REQ-034[SW-RMS-REQ-034]
+|xref:req-tool-sw-reqs.adoc#SW-RMS-REQ-033[SW-RMS-REQ-033], xref:req-tool-sw-reqs.adoc#SW-RMS-REQ-034[SW-RMS-REQ-034], SW-RMS-RE-999
 
 |[[UR-RMS-REQ-033]]UR-RMS-REQ-033
 |The SW shall be able to generate reports based on filters.
