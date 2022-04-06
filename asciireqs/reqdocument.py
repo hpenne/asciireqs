@@ -11,6 +11,9 @@ from asciireqs.fields import ID
 Requirement = Dict[str, str]
 Requirements = Dict[str, Requirement]
 
+class ReqParseError(Exception):
+    """This exception signals an error in requirement parsing"""
+    pass
 
 @dataclass
 class ReqDocument:
@@ -54,3 +57,17 @@ class ReqDocument:
     def add_child_doc(self, child_doc: ReqDocument) -> None:
         """Adds a child document to 'child_docs'"""
         self.child_docs.append(child_doc)
+
+
+def add_attribute(req: Requirement, name: str, value: str) -> None:
+    name = name.strip()
+    if not name:
+        raise ReqParseError(f"Empty attribute name")
+    if name in req:
+        raise ReqParseError(f"Attribute {name} already defined")
+    req[name] = value
+
+
+def add_attributes(req: Requirement, attributes: Dict[str, str]) -> None:
+    for name, value in attributes:
+        add_attribute(req, name, value)

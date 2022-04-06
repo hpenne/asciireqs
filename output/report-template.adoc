@@ -20,6 +20,7 @@
 
 |xref:req-tool-user-reqs.adoc#UR-RMS-REQ-031[UR-RMS-REQ-031]
 |The SW shall support exporting requirements tables to other formats
+
 |Rel-1
 
 |xref:req-tool-sw-reqs.adoc#SW-RMS-REQ-011[SW-RMS-REQ-011]
@@ -48,7 +49,7 @@ The attribute shall be on the form `:req-children: name.adoc`
 |ID |Line |Parent |Child 
 
 |xref:req-tool-user-reqs.adoc#UR-RMS-REQ-032[UR-RMS-REQ-032]
-|76
+|80
 |
 |xref:req-tool-sw-reqs.adoc#SW-RMS-REQ-033[SW-RMS-REQ-033], xref:req-tool-sw-reqs.adoc#SW-RMS-REQ-034[SW-RMS-REQ-034], SW-RMS-RE-999
 

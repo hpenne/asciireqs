@@ -4,7 +4,7 @@ import os
 import re
 from copy import copy
 from dataclasses import dataclass
-from typing import Iterable, List, Optional, Tuple
+from typing import Dict, Iterable, List, Optional, Tuple
 import yaml
 from yaml.scanner import ScannerError
 
@@ -306,12 +306,72 @@ def heading_has_required_fields(heading: Row, line_no: int) -> bool:
     return True
 
 
+def parse_term_req_attributes(line: str, line_no: int) -> Optional[Dict[str, str]]:
+    """Takes a line of term attribute text and returns the attributes in it"""
+    line = line.strip()
+    attribute_defs = (part.strip() for part in line.split(";") if part.strip())
+    attributes = {}
+    for name_value in attribute_defs:
+        parts = name_value.split(":")
+        if len(parts) != 2 or not parts[0].strip():
+            print(f"Error: Incorrect format for requirement in line {line_no}")
+            return {}
+        if parts[0] in attributes:
+            print(
+                f"Error: Attribute {parts[0]} already defined for requirement in line {line_no}"
+            )
+            return {}
+        attributes[parts[0]] = parts[1].strip()
+    return attributes
+
+
+def req_from_term(
+    first_line: str, line_no: int, lines: Iterable[Tuple[int, str]], doc: ReqDocument
+) -> Optional[Requirement]:
+    """
+    Tests a line of text to see if it is an AsciiDoc term used to define a requirement.
+    If it is then the function consumes as many additional lines as necessary to parse the
+    reqirement and return it
+    :param first_line: The line that may contain the start of a requirement as a term
+    :param line_no: The document line number of the first parameter
+    :param lines: The source for additional lines
+    :param doc: The document that is being parsed
+    :return: The requirement (or None if not found)
+    """
+    match = re.fullmatch(rf"({doc.req_prefix}\d+)::", first_line.strip())
+    if match:
+        req = {ID: match.group(1), LINE_NO: str(line_no)}
+        try:
+            req[TEXT] = next(lines)[1]
+            if next(lines)[1].strip() == "+":
+                attributes = parse_term_req_attributes(next(lines)[1], line_no + 3)
+                if not attributes:
+                    return None
+                for attr_name, _ in attributes.items():
+                    if attr_name in req:
+                        print(
+                            f"Error: Attribute {attr_name} already "
+                            "defined for requirement in line {line_no}"
+                        )
+                        return {}
+                req = {**req, **attributes}
+        except StopIteration:
+            pass
+        if validate_requirement(req, doc, line_no):
+            return req
+    return None
+
+
 def parse_doc(lines: Iterable[Tuple[int, str]]) -> ReqDocument:
     """Parses lines of AsciiDoc text and returns a ReqDocument with all the requirements etc."""
     doc = ReqDocument()
     for line_no, text in lines:
         text = text.rstrip()
-        if text == "[.reqs]":
+        term_req = req_from_term(text, line_no, lines, doc)
+        if term_req:
+            doc.add_keys(list(term_req.keys()))
+            doc.add_req(term_req)
+        elif text == "[.reqs]":
             heading, rows = get_table(lines)
             if heading and rows and heading_has_required_fields(heading, line_no):
                 doc.add_reqs(reqs_from_req_table(heading, rows, doc))

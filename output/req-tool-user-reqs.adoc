@@ -63,15 +63,19 @@ This is a requirement table:
 
 === Reporting
 
+This is a requirement on "term"-format:
+
+[[UR-RMS-REQ-031]]UR-RMS-REQ-031::
+The SW shall support exporting requirements tables to other formats
++
+Tags: Rel-1; Child: xref:req-tool-sw-reqs.adoc#SW-RMS-REQ-031[SW-RMS-REQ-031]
+
+Here are some more requirements as a table:
+
 [.reqs]
 [cols="2,4,1,2"]
 |===
 |ID |Text |Tags |Child
-
-|[[UR-RMS-REQ-031]]UR-RMS-REQ-031
-|The SW shall support exporting requirements tables to other formats
-|Rel-1
-|xref:req-tool-sw-reqs.adoc#SW-RMS-REQ-031[SW-RMS-REQ-031]
 
 |[[UR-RMS-REQ-032]]UR-RMS-REQ-032
 |The SW shall support analysis of requirements links between parent and child.

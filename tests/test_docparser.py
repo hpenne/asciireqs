@@ -12,6 +12,7 @@ from asciireqs.docparser import (
     req_from_yaml_block,
     get_cols_from_attribute,
     validate_requirement,
+    req_from_term,
 )
 from asciireqs.fields import ID, TEXT, PARENT, CHILD, LINE_NO
 from asciireqs.reqdocument import ReqDocument
@@ -299,3 +300,53 @@ def test_req_from_yaml_with_missing_id() -> None:
 
 def test_req_from_yaml_with_missing_text() -> None:
     assert not req_from_yaml_lines(["ID: SR-001"], doc_with_req_prefix(), 13)
+
+
+def test_req_from_term_with_text_only() -> None:
+    req = req_from_term(
+        "SR-001::", 2, enumerate(["Req. text"], start=3), doc_with_req_prefix()
+    )
+    assert req == {ID: "SR-001", TEXT: "Req. text", LINE_NO: "2"}
+
+
+def test_req_from_term_with_attributes() -> None:
+    req = req_from_term(
+        "SR-001::",
+        2,
+        enumerate(["Req. text", "+", "Child: R-01, R-02; Parent: UR-01"], start=3),
+        doc_with_req_prefix(),
+    )
+    assert req == {
+        ID: "SR-001",
+        TEXT: "Req. text",
+        PARENT: "UR-01",
+        CHILD: "R-01, R-02",
+        LINE_NO: "2",
+    }
+
+
+def test_req_from_term_with_doubly_defined_attribute() -> None:
+    assert not req_from_term(
+        "SR-001::",
+        2,
+        enumerate(["Req. text", "+", "Text: Text"], start=3),
+        doc_with_req_prefix(),
+    )
+
+
+def test_req_from_term_not_a_req_term() -> None:
+    assert not req_from_term(
+        "Some term::", 2, enumerate([], start=3), doc_with_req_prefix()
+    )
+
+
+def test_req_from_term_not_a_term() -> None:
+    assert not req_from_term(
+        "SR-001:", 2, enumerate([], start=3), doc_with_req_prefix()
+    )
+
+
+def test_req_from_term_empty_lines() -> None:
+    assert not req_from_term(
+        "SR-001::", 2, enumerate([], start=3), doc_with_req_prefix()
+    )
