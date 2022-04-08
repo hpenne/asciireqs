@@ -51,6 +51,8 @@ This is a requirement table:
 
 === Hierarchical specifications
 
+This is a single requirement using a table "form" format, which will more easily accommodate more attributes:
+
 [.req]
 [cols="1,1,1"]
 |===
@@ -63,30 +65,23 @@ This is a requirement table:
 
 === Reporting
 
-This is a requirement on "term"-format:
+This is a requirement on "term"-format, which some might find easier to work with than tables:
 
 UR-RMS-REQ-031::
 The SW shall support exporting requirements tables to other formats
 +
 Tags: Rel-1; Child: SW-RMS-REQ-031
 
-Here are some more requirements as a table:
+UR-RMS-REQ-032::
+The SW shall support analysis of requirements links between parent and child.
++
+Tags: Rel-2;
+Child: SW-RMS-REQ-033, SW-RMS-REQ-034, SW-RMS-RE-999
 
-[.reqs]
-[cols="2,4,1,2"]
-|===
-|ID |Text |Tags |Child
-
-|UR-RMS-REQ-032
-|The SW shall support analysis of requirements links between parent and child.
-|Rel-2
-|SW-RMS-REQ-033, SW-RMS-REQ-034, SW-RMS-RE-999
-
-|UR-RMS-REQ-033
-|The SW shall be able to generate reports based on filters.
-|Rel-2
-|SW-RMS-REQ-036
-
-|===
+UR-RMS-REQ-033::
+The SW shall be able to generate reports based on filters.
++
+Tags: Rel-2;
+Child: SW-RMS-REQ-036
 
 == Non functional requirements

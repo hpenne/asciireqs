@@ -49,7 +49,7 @@ The attribute shall be on the form `:req-children: name.adoc`
 |ID |Line |Parent |Child 
 
 |xref:req-tool-user-reqs.adoc#UR-RMS-REQ-032[UR-RMS-REQ-032]
-|80
+|75
 |
 |xref:req-tool-sw-reqs.adoc#SW-RMS-REQ-033[SW-RMS-REQ-033], xref:req-tool-sw-reqs.adoc#SW-RMS-REQ-034[SW-RMS-REQ-034], SW-RMS-RE-999
 

@@ -325,6 +325,22 @@ def test_req_from_term_with_attributes() -> None:
     }
 
 
+def test_req_from_term_with_multi_line_attributes() -> None:
+    req = req_from_term(
+        "SR-001::",
+        2,
+        enumerate(["Req. text", "+", "Child: R-01, R-02;", "Parent: UR-01"], start=3),
+        doc_with_req_prefix(),
+    )
+    assert req == {
+        ID: "SR-001",
+        TEXT: "Req. text",
+        PARENT: "UR-01",
+        CHILD: "R-01, R-02",
+        LINE_NO: "2",
+    }
+
+
 def test_req_from_term_with_doubly_defined_attribute() -> None:
     assert not req_from_term(
         "SR-001::",

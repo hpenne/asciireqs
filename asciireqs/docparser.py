@@ -327,6 +327,23 @@ def parse_term_req_attributes(line: str) -> Optional[Dict[str, str]]:
     return attributes
 
 
+def get_term_attributes(lines: Iterable[Tuple[int, str]]) -> Dict[str, str]:
+    """
+    Parses lines containing attributes from a requirement defined as an AsciiDoc term,
+    and returns the requirements. The last line consumed (if successful) is the
+    empty line following the last line of attributes.
+    :param lines: The input lines
+    :return: Requirement attributes
+    """
+    all_attributes: Dict[str, str] = {}
+    for _, line in lines:
+        attributes = parse_term_req_attributes(line)
+        if not attributes:
+            break
+        add_attributes(all_attributes, attributes)
+    return all_attributes
+
+
 def req_from_term(
     first_line: str, line_no: int, lines: Iterable[Tuple[int, str]], doc: ReqDocument
 ) -> Optional[Requirement]:
@@ -346,7 +363,7 @@ def req_from_term(
         try:
             req[TEXT] = next(iter(lines))[1]
             if next(iter(lines))[1].strip() == "+":
-                attributes = parse_term_req_attributes(next(iter(lines))[1])
+                attributes = get_term_attributes(lines)
                 if not attributes:
                     return None
                 add_attributes(req, attributes)
