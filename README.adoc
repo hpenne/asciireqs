@@ -25,29 +25,62 @@ Still, it is in a workable state and the current functionality is at a level whe
 
 AsciiReqs can:
 
-* Find requirements in tables with one requirement per row
-* Find requirements in tables where the table contains a single requirement over several lines
-* Find and parse sub specifications using AsciiDoc attributes, to parse a hierarchy of specifications
-* Identify requirement links to parent and child requirements
+* Find requirements defined using AsciiDoc "terms".
+* Find requirements defined using blocks of YAML (and convert them to the term form in post-processing).
+* Find requirements defined using tables with one requirement per row.
+* Find requirements in tables where the table contains a single requirement over several lines.
+* Find and parse sub specifications using AsciiDoc attributes, to parse a hierarchy of specifications.
+* Identify requirement links to parent and child requirements.
 * Post process requirement documents and insert AsciiDoc anchors and cross-links for the requirements, which turn into hyperlinks in the generated HTML.
 * Detect and execute inline "macros" that generate tables of requirements in the post processed document, based on arbitrary user-specified filters.
-* Export to CVS
+* Export to CVS.
 
 == Possible future directions
 
-Some might find the AsciiDoc table syntax a little difficult to work with.
-It is possible to make asciireqs look for and parse requirements embedded in the document as blocks of YAML.
-This is a syntax some might find more natural.
-You won't want YAML in your processed document,
-so the YAML will have to be replaced with something else during post-processing,
-perhaps a table form.
+Incomplete list:
+
+* Export to other formats (e.g. ReqIF, Excel)
+* Import (of course)
+* Set, add to or remove from attributes using external (imported) data.
+  E.g. add a new attribute (or add a new value to an attribute) to all or many requirements using external data (e.g. CVS).
+* Four ways of defining requirements are supported (terms, YAML and two kinds of tables). This is a little excessive.
+  Perhaps the less useful ones should be deprecated.
 
 == How does it work?
 
 Write your requirement specification in AsciiDoc.
-Put the requirements in tables.
+Define the requirements as terms, YAML or put them in in tables.  Your document is where the requirements are actually stored, and everything else is post-processing.  Use your favourite version control system for storage, versioning and collaboration.
 
 === Defining requirements
+
+==== Requirements as AsciiDoc "terms"
+
+A requirement can be defined a an AsciiDoc "term":
+
+[source, asciidoc]
+----
+UR-RMS-011::
+This is the text defining the first requirement
++
+Tags: V.1;
+Child: SW-RMS-REQ-011
+----
+
+This renders as:
+
+UR-RMS-011::
+This is the text defining the first requirement
++
+Tags: V.1;
+Child: SW-RMS-REQ-011
+
+
+The term itself becomes the requirement ID and the following text becomes the "Text" attribute.
+
+If the text is followed by a line with a "+" (AsciiDoc hard line break),
+then what follows is interpreted as a list of semicolon-separated list of "name: value" attribute pairs.
+You can put them all on a single line, or split them after the semicolon as shown above.
+Using multiple lines plays better with diff-views.
 
 ==== Tables with multiple requirements
 
