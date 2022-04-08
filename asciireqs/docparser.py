@@ -375,9 +375,7 @@ def parse_doc(lines: Iterable[Tuple[int, str]]) -> ReqDocument:
         elif text == "[.req]":
             heading, rows = get_table(lines)
             if rows:
-                req = req_from_single_req_table(rows, doc)
-                if req:
-                    doc.add_req(req)
+                doc.add_req(req_from_single_req_table(rows, doc))
         elif text == "[.reqy]":
             for req in req_from_yaml_block(lines, doc):
                 doc.add_req(req)

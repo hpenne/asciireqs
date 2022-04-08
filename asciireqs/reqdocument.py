@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 from dataclasses import dataclass
-from typing import Dict
+from typing import Dict, Optional
 from typing import Iterable
 from typing import List
 
@@ -41,8 +41,10 @@ class ReqDocument:
             if key not in self.attribute_names:
                 self.attribute_names.append(key)
 
-    def add_req(self, requirement: Requirement) -> None:
+    def add_req(self, requirement: Optional[Requirement]) -> None:
         """Adds a new requirement to 'reqs' and the keys to 'keys'"""
+        if not requirement:
+            return
         req_id = requirement[ID]
         assert req_id
         if req_id in self.reqs:
