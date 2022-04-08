@@ -158,12 +158,11 @@ def test_requirement_as_term() -> None:
         CHILD: "R1, R2",
     }
 
-    lines = list(requirement_as_term(sr.reqs["SR-1"], ur))
-    assert len(lines) == 4
-    assert lines[0] == "[horizontal]\n"
-    assert lines[1] == "[[SR-1]]SR-1:: Some requirement\n"
-    assert lines[2] == "+\n"
-    assert lines[3] == "Parent: xref:ur.adoc#UR-1[UR-1]; Child: R1, R2\n"
+    assert list(requirement_as_term(sr.reqs["SR-1"], ur)) == [
+        "[[SR-1]]SR-1:: Some requirement\n",
+        "+\n",
+        "Parent: xref:ur.adoc#UR-1[UR-1]; Child: R1, R2\n",
+    ]
 
 
 def test_requirement_as_term_with_multiline_text() -> None:
@@ -176,9 +175,8 @@ def test_requirement_as_term_with_multiline_text() -> None:
         LINE_NO: "100",
     }
 
-    lines = list(requirement_as_term(ur.reqs["UR-1"], ur))
-    assert len(lines) == 4
-    assert lines[0] == "[horizontal]\n"
-    assert lines[1] == "[[UR-1]]UR-1:: This is paragraph one\n+\nand this is paragraph two\n"
-    assert lines[2] == "+\n"
-    assert lines[3] == "Child: SR-1\n"
+    assert list(requirement_as_term(ur.reqs["UR-1"], ur)) == [
+        "[[UR-1]]UR-1:: This is paragraph one\n+\nand this is paragraph two\n",
+        "+\n",
+        "Child: SR-1\n",
+    ]

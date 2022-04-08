@@ -205,7 +205,6 @@ def requirement_as_term(req: Requirement, doc: ReqDocument) -> Iterable[str]:
     :param doc: The top level document (used to insert requirement links)
     :return: Lines of AsciiDoc
     """
-    yield "[horizontal]\n"
     yield "[[" + req[ID] + "]]" + req[ID] + ":: " + insert_requirement_links(
         req[TEXT].replace("\n\n", "\n+\n"), doc
     ) + "\n"
