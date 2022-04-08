@@ -9,7 +9,14 @@ import yaml
 from yaml.scanner import ScannerError
 
 from asciireqs.fields import ID, TEXT, LINE_NO
-from asciireqs.reqdocument import ReqDocument, Requirement, Requirements
+from asciireqs.reqdocument import (
+    ReqDocument,
+    Requirement,
+    Requirements,
+    ReqParseError,
+    add_attribute,
+    add_attributes,
+)
 
 
 @dataclass
@@ -306,21 +313,16 @@ def heading_has_required_fields(heading: Row, line_no: int) -> bool:
     return True
 
 
-def parse_term_req_attributes(line: str, line_no: int) -> Optional[Dict[str, str]]:
+def parse_term_req_attributes(line: str) -> Optional[Dict[str, str]]:
     """Takes a line of term attribute text and returns the attributes in it"""
     line = line.strip()
     attribute_defs = (part.strip() for part in line.split(";") if part.strip())
-    attributes = {}
+    attributes: Dict[str, str] = {}
     for name_value in attribute_defs:
         parts = name_value.split(":")
-        if len(parts) != 2 or not parts[0].strip():
-            print(f"Error: Incorrect format for requirement in line {line_no}")
-            return {}
-        if parts[0] in attributes:
-            print(
-                f"Error: Attribute {parts[0]} already defined for requirement in line {line_no}"
-            )
-            return {}
+        if len(parts) != 2:
+            raise ReqParseError("Incorrect format for requirement")
+        add_attribute(attributes, parts[0], parts[1])
         attributes[parts[0]] = parts[1].strip()
     return attributes
 
@@ -342,21 +344,17 @@ def req_from_term(
     if match:
         req = {ID: match.group(1), LINE_NO: str(line_no)}
         try:
-            req[TEXT] = next(lines)[1]
-            if next(lines)[1].strip() == "+":
-                attributes = parse_term_req_attributes(next(lines)[1], line_no + 3)
+            req[TEXT] = next(iter(lines))[1]
+            if next(iter(lines))[1].strip() == "+":
+                attributes = parse_term_req_attributes(next(iter(lines))[1])
                 if not attributes:
                     return None
-                for attr_name, _ in attributes.items():
-                    if attr_name in req:
-                        print(
-                            f"Error: Attribute {attr_name} already "
-                            "defined for requirement in line {line_no}"
-                        )
-                        return {}
-                req = {**req, **attributes}
+                add_attributes(req, attributes)
         except StopIteration:
             pass
+        except ReqParseError as exception:
+            print(f"Error: {exception} on line {line_no}")
+            return None
         if validate_requirement(req, doc, line_no):
             return req
     return None
@@ -369,23 +367,19 @@ def parse_doc(lines: Iterable[Tuple[int, str]]) -> ReqDocument:
         text = text.rstrip()
         term_req = req_from_term(text, line_no, lines, doc)
         if term_req:
-            doc.add_keys(list(term_req.keys()))
             doc.add_req(term_req)
         elif text == "[.reqs]":
             heading, rows = get_table(lines)
             if heading and rows and heading_has_required_fields(heading, line_no):
                 doc.add_reqs(reqs_from_req_table(heading, rows, doc))
-                doc.add_keys(heading_names(heading))
         elif text == "[.req]":
             heading, rows = get_table(lines)
             if rows:
                 req = req_from_single_req_table(rows, doc)
                 if req:
-                    doc.add_keys(list(req.keys()))
                     doc.add_req(req)
         elif text == "[.reqy]":
             for req in req_from_yaml_block(lines, doc):
-                doc.add_keys(list(req.keys()))
                 doc.add_req(req)
         else:
             attribute_value = get_attribute(text, "req-children")
