@@ -27,8 +27,6 @@ AsciiReqs can:
 
 * Find requirements defined using AsciiDoc "terms".
 * Find requirements defined using blocks of YAML (and convert them to the term form in post-processing).
-* Find requirements defined using tables with one requirement per row.
-* Find requirements in tables where the table contains a single requirement over several lines.
 * Find and parse sub specifications using AsciiDoc attributes, to parse a hierarchy of specifications.
 * Identify requirement links to parent and child requirements.
 * Post process requirement documents and insert AsciiDoc anchors and cross-links for the requirements, which turn into hyperlinks in the generated HTML.
@@ -49,7 +47,7 @@ Incomplete list:
 == How does it work?
 
 Write your requirement specification in AsciiDoc.
-Define the requirements as terms, YAML or put them in in tables.  Your document is where the requirements are actually stored, and everything else is post-processing.  Use your favourite version control system for storage, versioning and collaboration.
+Define the requirements as terms or YAML.  Your document is where the requirements are actually stored, and everything else is post-processing.  Use your favourite version control system for storage, versioning and collaboration.
 
 === Defining requirements
 
@@ -81,82 +79,6 @@ If the text is followed by a line with a "+" (AsciiDoc hard line break),
 then what follows is interpreted as a list of semicolon-separated list of "name: value" attribute pairs.
 You can put them all on a single line, or split them after the semicolon as shown above.
 Using multiple lines plays better with diff-views.
-
-==== Tables with multiple requirements
-
-The simplest way is to put them in table with a heading row defining the requirement fields, and where each normal row defines a requirement.
-The line immediately before the table is marked with an AsciiDoc "role" (.reqs) to mark the table as an asciireqs requirement table:
-
-[source, asciidoc]
-----
-[.reqs]
-[cols="2,4,1,2"]
-|===
-|ID |Text |Tags |Child
-
-|UR-RMS-011
-|This is the text defining the first requirement
-|V.1
-|SW-RMS-REQ-011
-
-|UR-RMS-012
-|This is the text defining the second requirement
-|V.1.1
-|
-|===
-----
-
-This will be rendered by AsciiDoc as:
-[cols="2,4,1,2"]
-|===
-|ID |Text |Tags |Child
-
-|UR-RMS-011
-|This is the text defining the first requirement
-|V.1
-|SW-RMS-REQ-011
-
-|UR-RMS-012
-|This is the text defining the second requirement
-|V.1.1
-|
-|===
-
-Asciireqs will parse this table and pick up all the requirements and add them to the project model, under the current document.
-It will do so for all the tables marked with the ".reqs" role.
-
-==== Tables (forms) with a single requirement
-
-If requirements have more fields than will easily fit in a normal table then you can also use a table as a form that defines a single requirement (note that the role must be ".req" instead of ".reqs").
-
-[source, asciidoc]
-----
-[.req]
-[cols="1,1,1"]
-|===
-|UR-RMS-021
-|Child: SW-RMS-021
-|Tags: V.1
-3+|This is the text that defines the requirement
-|===
-----
-
-This renders as:
-
-[cols=3]
-|===
-|UR-RMS-021
-|Child: SW-RMS-021
-|Tags: V.1
-3+|This is the text that defines the requirement.
-|===
-
-Notice how the AsciiDoc "cols" attribute is used here to define the number of columns when the table has no heading row.
-
-Also notice that the first cell is the requirement ID implicitly, while the other cells use a "property: value" syntax to define requirement property names and values (unlike a normal table where the column heading defines the property names).
-The exception is the last merged cell that defines the requirement Text property.
-
-You can use as many rows of requirement properties as necessary, but the last row must be a single merged cell containing the requirement text.
 
 ==== YAML block with a single requirement
 
