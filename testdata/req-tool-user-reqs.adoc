@@ -22,50 +22,39 @@ This a sample requirement specification for testing of asciireqs, containing use
 == Functional requirements
 
 === Data management and collaboration
-This is a requirement table:
-[.reqs]
-[cols="2,4,1,2"]
-|===
-|ID |Text |Tags |Child
 
-|UR-RMS-REQ-011
-|The SW shall support an internally hosted central data store.
-|Rel-1
-|SW-RMS-REQ-011
+Reqirements are written as AsciiDoc "terms":
 
-|UR-RMS-REQ-012
-|The SW shall support versioning and baselining
-|Rel-2
-|
+UR-RMS-REQ-011::
+The SW shall support an internally hosted central data store.
++
+Tags: Rel-1;
+Child: SW-RMS-REQ-011
 
-|UR-RMS-REQ-013
-|The SW shall support review of changes and store the history of the review and approval process.
-|Rel-2
-|
+UR-RMS-REQ-012::
+The SW shall support versioning and baselining
++
+Tags: Rel-2
 
-|UR-RMS-REQ-014
-|The SW shall support an efficient and smooth process for the proposal and approval of changes, to facilitate collaboration.
-|Rel-2
-|
-|===
+UR-RMS-REQ-013::
+The SW shall support review of changes and store the history of the review and approval process.
++
+Tags: Rel-2
+
+UR-RMS-REQ-014::
+The SW shall support an efficient and smooth process for the proposal and approval of changes, to facilitate collaboration.
++
+Tags: Rel-2
 
 === Hierarchical specifications
 
-This is a single requirement using a table "form" format, which will more easily accommodate more attributes:
-
-[.req]
-[cols="1,1,1"]
-|===
-|UR-RMS-REQ-021
-|Child: SW-RMS-REQ-021
-|Tags: Rel-1
-3+|The SW shall support hierarchical specifications documents, and links between parent and child requirements.
-|===
+UR-RMS-REQ-021::
+The SW shall support hierarchical specifications documents, and links between parent and child requirements.
++
+Tags: Rel-1; Child: SW-RMS-REQ-021
 
 
 === Reporting
-
-This is a requirement on "term"-format, which some might find easier to work with than tables:
 
 UR-RMS-REQ-031::
 The SW shall support exporting requirements tables to other formats

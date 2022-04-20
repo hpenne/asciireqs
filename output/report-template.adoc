@@ -12,10 +12,12 @@
 
 |xref:req-tool-user-reqs.adoc#UR-RMS-REQ-011[UR-RMS-REQ-011]
 |The SW shall support an internally hosted central data store.
+
 |Rel-1
 
 |xref:req-tool-user-reqs.adoc#UR-RMS-REQ-021[UR-RMS-REQ-021]
 |The SW shall support hierarchical specifications documents, and links between parent and child requirements.
+
 |Rel-1
 
 |xref:req-tool-user-reqs.adoc#UR-RMS-REQ-031[UR-RMS-REQ-031]
@@ -25,6 +27,7 @@
 
 |xref:req-tool-sw-reqs.adoc#SW-RMS-REQ-011[SW-RMS-REQ-011]
 |The requirements shall be stored an asciidoc text files, for storage in a configuration management system like git.
+
 |Rel-1
 
 |xref:req-tool-sw-reqs.adoc#SW-RMS-REQ-021[SW-RMS-REQ-021]
@@ -39,6 +42,7 @@ The attribute shall be on the form `:req-children: name.adoc`
 
 |xref:req-tool-sw-reqs.adoc#SW-RMS-REQ-031[SW-RMS-REQ-031]
 |The SW shall support exporting the requirements from a document to CVS format.
+
 |Rel-1
 
 |===
@@ -49,7 +53,7 @@ The attribute shall be on the form `:req-children: name.adoc`
 |ID |Line |Parent |Child 
 
 |xref:req-tool-user-reqs.adoc#UR-RMS-REQ-032[UR-RMS-REQ-032]
-|75
+|64
 |
 |xref:req-tool-sw-reqs.adoc#SW-RMS-REQ-033[SW-RMS-REQ-033], xref:req-tool-sw-reqs.adoc#SW-RMS-REQ-034[SW-RMS-REQ-034], SW-RMS-RE-999
 
@@ -62,6 +66,7 @@ The attribute shall be on the form `:req-children: name.adoc`
 
 |xref:req-tool-sw-reqs.adoc#SW-RMS-REQ-011[SW-RMS-REQ-011]
 |The requirements shall be stored an asciidoc text files, for storage in a configuration management system like git.
+
 |Rel-1
 
 |xref:req-tool-sw-reqs.adoc#SW-RMS-REQ-022[SW-RMS-REQ-022]
@@ -70,6 +75,7 @@ The attribute shall be on the form `:req-children: name.adoc`
 
 |xref:req-tool-sw-reqs.adoc#SW-RMS-REQ-035[SW-RMS-REQ-035]
 |The SW shall be able to generate a report table that lists requirements that have inconsistent parent/child relationships (linked in only one direction).
+
 |Rel-2
 
 |===
