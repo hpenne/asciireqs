@@ -4,7 +4,7 @@ import os
 import re
 from typing import Dict, Iterable, List, Optional, Tuple
 
-from asciireqs.fields import ID, LINE_NO, TEXT, CHILD, PARENT
+from asciireqs.fields import ID, LINE_NO, TEXT, CHILD, PARENT, TITLE
 from asciireqs.docparser import Project, req_from_yaml_block
 from asciireqs.reqdocument import ReqDocument, Requirement, Requirements
 
@@ -205,14 +205,18 @@ def requirement_as_term(req: Requirement, doc: ReqDocument) -> Iterable[str]:
     :param doc: The top level document (used to insert requirement links)
     :return: Lines of AsciiDoc
     """
-    yield "[[" + req[ID] + "]]" + req[ID] + ":: " + insert_requirement_links(
+    yield "[[" + req[ID] + "]]" + req[ID] + "::\n"
+    if TITLE in req:
+        yield req[TITLE] + ":\n"
+        yield "+\n"
+    yield insert_requirement_links(
         req[TEXT].replace("\n\n", "\n+\n"), doc
     ) + "\n"
     yield "+\n"
     yield "; ".join(
         attribute + ": " + insert_requirement_links(value, doc)
         for attribute, value in req.items()
-        if attribute not in (ID, TEXT, LINE_NO)
+        if attribute not in (ID, TITLE, TEXT, LINE_NO)
     ) + "\n"
 
 

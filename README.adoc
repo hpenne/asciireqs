@@ -58,7 +58,10 @@ A requirement can be defined a an AsciiDoc "term":
 [source, asciidoc]
 ----
 UR-RMS-011::
-This is the text defining the first requirement
+This is the (optional) requirement title:
++
+This is the text defining the first requirement.
+The text can span multiple lines.
 +
 Tags: V.1;
 Child: SW-RMS-REQ-011
@@ -67,13 +70,19 @@ Child: SW-RMS-REQ-011
 This renders as:
 
 UR-RMS-011::
-This is the text defining the first requirement
+This is the (optional) requirement title:
++
+This is the text defining the first requirement.
+The text can span multiple lines.
 +
 Tags: V.1;
 Child: SW-RMS-REQ-011
 
+The term itself becomes the requirement ID.
+The title is optional.
+It is restricted to a single line and ends with a colon and a paragraph break (the line with the "+").
 
-The term itself becomes the requirement ID and the following text becomes the "Text" attribute.
+The text that follows the title becomes the "Text" attribute.
 
 If the text is followed by a line with a "+" (AsciiDoc hard line break),
 then what follows is interpreted as a list of semicolon-separated list of "name: value" attribute pairs.
@@ -93,6 +102,7 @@ The following lines of AsciiDoc will define a requirement using YAML:
 ID: UR-RMS-021
 Child: SW-RMS-021
 Tags: V.1
+Title: This is the requirement title
 Text: This is the text that defines the requirement
 ----
 -----
@@ -100,11 +110,14 @@ Text: This is the text that defines the requirement
 Some may find this format easier to read and write while working with the requirements, but it leaves a little to be desired in the final print.
 AsciiReqs will therefore transform this into an AsciiDoc "Term" in the following style when the adoc files are processed:
 
-UR-RMS-021:: This is the text that defines the requirement
+UR-RMS-021::
+This is the requirement title:
++
+This is the text that defines the requirement
 +
 Child: SW-RMS-021; Tags: V.1
 
-This is different from using tables, where the only modification made during processing is to insert anchors and cross-links for the requirement IDs.
+The title is (again) optional.
 
 It is also possible to define several requirements in one YAML block using a slightly different format:
 
@@ -133,6 +146,8 @@ The requirements consist of named properties with values.
 The following property names are treated specially by asciireqs:
 
 * ID: The requirement identifier
+* Title: This is the title identified just after the ID when parsing term-requirements.
+* Text: This is the requirement text identified just after the ID/Title when parsing term-requirements.
 * Child: The value is interpreted as a comma separated list of requirement identifiers for child requirements in a sub specification (links from a high level requirement to requirement further down in the specification hierarchy)
 * Parent: The value is interpreted as a comma separated list of requirement identifiers linking up to parent requirements higher in the hierarchy.
 * Line: This attribute is set by asciireqs to the line number where the requirement was found.

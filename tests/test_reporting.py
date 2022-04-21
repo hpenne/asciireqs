@@ -1,6 +1,6 @@
 """tests_reporting - Tests for reporting.py"""
 from asciireqs.docparser import Project
-from asciireqs.fields import ID, LINE_NO, TEXT, PARENT, CHILD
+from asciireqs.fields import ID, LINE_NO, TEXT, PARENT, CHILD, TITLE
 from asciireqs.reporting import (
     get_spec_hierarchy,
     line_numbers_for_requirements,
@@ -159,7 +159,37 @@ def test_requirement_as_term() -> None:
     }
 
     assert list(requirement_as_term(sr.reqs["SR-1"], ur)) == [
-        "[[SR-1]]SR-1:: Some requirement\n",
+        "[[SR-1]]SR-1::\n",
+        "Some requirement\n",
+        "+\n",
+        "Parent: xref:ur.adoc#UR-1[UR-1]; Child: R1, R2\n",
+    ]
+
+
+def test_requirement_as_term_with_title() -> None:
+    ur = ReqDocument()
+    ur.req_prefix = "UR-"
+    ur.name = "ur.adoc"
+    ur.reqs["UR-1"] = {
+        ID: "UR-1",
+        CHILD: "SR-1",
+        LINE_NO: "100",
+    }
+    sr = ReqDocument()
+    ur.child_docs = [sr]
+    sr.reqs["SR-1"] = {
+        ID: "SR-1",
+        TITLE: "Some title",
+        TEXT: "Some requirement",
+        PARENT: "UR-1",
+        CHILD: "R1, R2",
+    }
+
+    assert list(requirement_as_term(sr.reqs["SR-1"], ur)) == [
+        "[[SR-1]]SR-1::\n",
+        "Some title:\n",
+        "+\n",
+        "Some requirement\n",
         "+\n",
         "Parent: xref:ur.adoc#UR-1[UR-1]; Child: R1, R2\n",
     ]
@@ -176,7 +206,8 @@ def test_requirement_as_term_with_multiline_text() -> None:
     }
 
     assert list(requirement_as_term(ur.reqs["UR-1"], ur)) == [
-        "[[UR-1]]UR-1:: This is paragraph one\n+\nand this is paragraph two\n",
+        "[[UR-1]]UR-1::\n",
+        "This is paragraph one\n+\nand this is paragraph two\n",
         "+\n",
         "Child: SR-1\n",
     ]
