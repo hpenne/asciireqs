@@ -8,7 +8,7 @@ from typing import Dict, Iterable, List, Optional, Tuple
 import yaml
 from yaml.scanner import ScannerError
 
-from asciireqs.fields import ID, TEXT, LINE_NO
+from asciireqs.fields import ID, TEXT, LINE_NO, TITLE
 from asciireqs.reqdocument import (
     ReqDocument,
     Requirement,
@@ -176,7 +176,7 @@ def req_from_term(
     """
     Tests a line of text to see if it is an AsciiDoc term used to define a requirement.
     If it is then the function consumes as many additional lines as necessary to parse the
-    reqirement and return it
+    requirement and return it
     :param first_line: The line that may contain the start of a requirement as a term
     :param line_no: The document line number of the first parameter
     :param lines: The source for additional lines
@@ -187,12 +187,34 @@ def req_from_term(
     if match:
         req = {ID: match.group(1), LINE_NO: str(line_no)}
         try:
-            req[TEXT] = next(iter(lines))[1]
-            if next(iter(lines))[1].strip() == "+":
-                attributes = get_term_attributes(lines)
-                if not attributes:
+            # The next line is either a title or the first line of requirement text:
+            line_iter = iter(lines)
+            line = next(line_iter)[1]
+            if line.rstrip().endswith(":"):
+                # This is the title:
+                req[TITLE] = line.rstrip(":")
+                line_no, line = next(line_iter)
+                if line.strip() != "+":
+                    print(f'Error: Expected "+" on line {line_no}')
                     return None
-                add_attributes(req, attributes)
+                req[TEXT] = next(line_iter)[1]
+            else:
+                req[TEXT] = line
+
+            # Next follows one or more lines of requirement text:
+            while True:
+                line = next(line_iter)[1].strip()
+                if line == "+":
+                    # The break marks the end of the text. Get the attributes:
+                    attributes = get_term_attributes(lines)
+                    if not attributes:
+                        return None
+                    add_attributes(req, attributes)
+                    break
+                if not line:
+                    break
+                # More requirement text:
+                req[TEXT] = req[TEXT] + "\n" + line
         except StopIteration:
             pass
         except ReqParseError as exception:

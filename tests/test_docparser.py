@@ -8,7 +8,7 @@ from asciireqs.docparser import (
     validate_requirement,
     req_from_term,
 )
-from asciireqs.fields import ID, TEXT, PARENT, CHILD, LINE_NO
+from asciireqs.fields import ID, TEXT, PARENT, CHILD, LINE_NO, TITLE
 from asciireqs.reqdocument import ReqDocument
 
 
@@ -143,15 +143,42 @@ def test_req_from_term_with_text_only() -> None:
     assert req == {ID: "SR-001", TEXT: "Req. text", LINE_NO: "2"}
 
 
+def test_req_from_term_with_multi_line_text() -> None:
+    req = req_from_term(
+        "SR-001::", 2, enumerate(["Req. text1", "Req. text2"], start=3), doc_with_req_prefix()
+    )
+    assert req == {ID: "SR-001", TEXT: "Req. text1\nReq. text2", LINE_NO: "2"}
+
+
 def test_req_from_term_with_attributes() -> None:
     req = req_from_term(
         "SR-001::",
         2,
-        enumerate(["Req. text", "+", "Child: R-01, R-02; Parent: UR-01"], start=3),
+        enumerate(["Req. text1", "Req. text2", "+", "Child: R-01, R-02; Parent: UR-01"], start=3),
         doc_with_req_prefix(),
     )
     assert req == {
         ID: "SR-001",
+        TEXT: "Req. text1\nReq. text2",
+        PARENT: "UR-01",
+        CHILD: "R-01, R-02",
+        LINE_NO: "2",
+    }
+
+
+def test_req_from_term_with_title_and_attributes() -> None:
+    req = req_from_term(
+        "SR-001::",
+        2,
+        enumerate(
+            ["Some title:", "+", "Req. text", "+", "Child: R-01, R-02; Parent: UR-01"],
+            start=3,
+        ),
+        doc_with_req_prefix(),
+    )
+    assert req == {
+        ID: "SR-001",
+        TITLE: "Some title",
         TEXT: "Req. text",
         PARENT: "UR-01",
         CHILD: "R-01, R-02",
