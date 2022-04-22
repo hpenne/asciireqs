@@ -209,9 +209,7 @@ def requirement_as_term(req: Requirement, doc: ReqDocument) -> Iterable[str]:
     if TITLE in req:
         yield req[TITLE] + ":\n"
         yield "+\n"
-    yield insert_requirement_links(
-        req[TEXT].replace("\n\n", "\n+\n"), doc
-    ) + "\n"
+    yield insert_requirement_links(req[TEXT].replace("\n\n", "\n+\n"), doc) + "\n"
     yield "+\n"
     yield "; ".join(
         attribute + ": " + insert_requirement_links(value, doc)
