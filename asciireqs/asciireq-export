@@ -3,11 +3,35 @@
 
 import argparse
 import os
+from typing import List, Dict, Iterable
 
 import sys
 
 from asciireqs.docparser import read_and_parse_project
 import openpyxl
+
+
+def export_to_csv(outputpath: str, attributes: List[str], reqs:  Iterable[Dict[str, str]]) -> None:
+    """Exports the requirements to a CSV file"""
+    with open(outputpath, "w", encoding="utf-8") as csv_file:
+        csv_file.write(",".join(attributes))
+        csv_file.write("\n")
+        for req in reqs:
+            csv_file.write(
+                ",".join(req[key] if key in req else "" for key in attributes)
+            )
+            csv_file.write("\n")
+
+
+def export_to_excel(outputpath: str, attributes: List[str], reqs:  Iterable[Dict[str, str]]) -> None:
+    """Exports the requirements to an XSLX Excel file"""
+    wb = openpyxl.Workbook()
+    ws = wb.active
+    ws.append(attributes)
+    for req in reqs:
+        ws.append([req[key] if key in req else "" for key in attributes])
+    wb.save(outputpath)
+    wb.close()
 
 
 def main() -> None:
@@ -38,32 +62,11 @@ def main() -> None:
         if args.recursive
         else project.root_document.reqs.values()
     )
-
+    attributes = project.root_document.attribute_names
     if extension == ".cvs":
-        with open(args.outputpath, "w", encoding="utf-8") as csv_file:
-            csv_file.write(",".join(project.root_document.attribute_names))
-            csv_file.write("\n")
-            for req in reqs:
-                csv_file.write(
-                    ",".join(
-                        req[key] if key in req else ""
-                        for key in project.root_document.attribute_names
-                    )
-                )
-                csv_file.write("\n")
+        export_to_csv(args.outputpath, attributes, reqs)
     elif extension == ".xlsx":
-        wb = openpyxl.Workbook()
-        ws = wb.active
-        ws.append(project.root_document.attribute_names)
-        for req in reqs:
-            ws.append(
-                [
-                    req[key] if key in req else ""
-                    for key in project.root_document.attribute_names
-                ]
-            )
-        wb.save(args.outputpath)
-        wb.close()
+        export_to_excel(args.outputpath, attributes, reqs)
 
 
 if __name__ == "__main__":
