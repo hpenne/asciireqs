@@ -6,11 +6,11 @@ from asciireqs.reporting import (
     line_numbers_for_requirements,
     insert_requirement_links,
     insert_anchor,
-    has_element,
     split_req_list,
     missing_link_from_parent,
     evaluate_requirement_against_filter,
     requirement_as_term,
+    elements,
 )
 from asciireqs.reqdocument import ReqDocument, Requirements
 
@@ -70,12 +70,10 @@ def test_insert_anchor() -> None:
     )
 
 
-def test_has_element() -> None:
-    s = "One, Two,Three"
-    assert has_element(s, "One")
-    assert has_element(s, "Three")
-    assert not has_element(s, "Four")
-    assert not has_element(s, "Two,Three")
+def test_elements() -> None:
+    assert elements("") == []
+    assert elements("One, Two,Three") == ["One", "Two", "Three"]
+    assert elements("One , Two,,Three") == ["One", "Two", "Three"]
 
 
 def test_split_req_list_empty() -> None:
@@ -86,14 +84,42 @@ def test_split_req_list() -> None:
     assert split_req_list("One, Two,Three") == ["One", "Two", "Three"]
 
 
-def test_missing_link_from_parent_link_ok() -> None:
+def get_project_for_filter_tests() -> Project:
     ur = ReqDocument()
-    ur.reqs["UR-1"] = {ID: "UR-1", CHILD: "SR-1"}
+    ur.add_req({ID: "UR-1", CHILD: "SR-1"})
     sr = ReqDocument()
     ur.child_docs = [sr]
-    sr1 = {ID: "SR-1", PARENT: "UR-1"}
-    sr.reqs["SR-1"] = sr1
-    project = Project(ur, {**ur.reqs, **sr.reqs})
+    sr.add_req(
+        {
+            ID: "SR-1",
+            PARENT: "UR-1",
+            "Tags": "Version1, Implemented",
+            "Name with spaces": "Value",
+        }
+    )
+    return Project(ur, {**ur.reqs, **sr.reqs})
+
+
+def test_filter_that_looks_for_tag() -> None:
+    project = get_project_for_filter_tests()
+    assert evaluate_requirement_against_filter(
+        project.requirements["SR-1"], project, '"Implemented" in elements(Tags)'
+    )
+    assert not evaluate_requirement_against_filter(
+        project.requirements["SR-1"], project, '"Version2" in elements(Tags)'
+    )
+
+
+def test_filter_referencing_attribute_name_with_spaces() -> None:
+    project = get_project_for_filter_tests()
+    assert evaluate_requirement_against_filter(
+        project.requirements["SR-1"], project, 'Name_with_spaces == "Value"'
+    )
+
+
+def test_missing_link_from_parent_link_ok() -> None:
+    project = get_project_for_filter_tests()
+    sr1 = project.requirements["SR-1"]
     assert not missing_link_from_parent(sr1, project)
     assert not evaluate_requirement_against_filter(sr1, project, "link_error()")
 
@@ -132,12 +158,6 @@ def test_missing_link_from_parent_two_of_two_downlinks_ok() -> None:
     sr.reqs["SR-1"] = sr1
     project = Project(ur, {**ur.reqs, **sr.reqs})
     assert not missing_link_from_parent(sr1, project)
-    assert evaluate_requirement_against_filter(
-        sr1, project, 'has_element(req["Parent"], "UR-1")'
-    )
-    assert not evaluate_requirement_against_filter(
-        sr1, project, 'has_element(req["Parent"], "UR-3")'
-    )
 
 
 def test_requirement_as_term() -> None:

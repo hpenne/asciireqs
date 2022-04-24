@@ -30,13 +30,15 @@ Parent: xref:req-tool-user-reqs.adoc#UR-RMS-REQ-011[UR-RMS-REQ-011], xref:req-to
 
 === Hierarchical specifications
 
-[[SW-RMS-REQ-021]]SW-RMS-REQ-021:: An attribute for child documents shall be used to define the link between a parent and child specification document.
+[[SW-RMS-REQ-021]]SW-RMS-REQ-021::
+An attribute for child documents shall be used to define the link between a parent and child specification document.
 +
 The attribute shall be on the form `:req-children: name.adoc`
 +
 Parent: xref:req-tool-user-reqs.adoc#UR-RMS-REQ-021[UR-RMS-REQ-021]; Tags: Rel-1
 
-[[SW-RMS-REQ-022]]SW-RMS-REQ-022:: The SW shall insert AsciiDoc anchors for the requirement definition and cross-links where they are referenced
+[[SW-RMS-REQ-022]]SW-RMS-REQ-022::
+The SW shall insert AsciiDoc anchors for the requirement definition and cross-links where they are referenced
 +
 Parent: xref:req-tool-user-reqs.adoc#UR-RMS-REQ-021[UR-RMS-REQ-021]; Tags: Rel-1
 

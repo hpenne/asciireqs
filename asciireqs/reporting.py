@@ -2,7 +2,7 @@
 
 import os
 import re
-from typing import Dict, Iterable, List, Optional, Tuple
+from typing import Dict, Iterable, List, Optional, Tuple, Any
 
 from asciireqs.fields import ID, LINE_NO, TEXT, CHILD, PARENT, TITLE
 from asciireqs.docparser import Project, req_from_yaml_block
@@ -17,12 +17,9 @@ def get_spec_hierarchy(doc: ReqDocument, preamble: str) -> Iterable[str]:
         yield from get_spec_hierarchy(sub_doc, preamble)
 
 
-def has_element(field_text: str, sub_str: str) -> bool:
-    """Takes a string of comma separated values and returns True if the specified value was found"""
-    for element in field_text.split(","):
-        if element.strip() == sub_str:
-            return True
-    return False
+def elements(field_text: str) -> List[str]:
+    """Takes a comma separated lists and returns each element in a list of strings"""
+    return [element.strip() for element in field_text.split(",") if element]
 
 
 def split_req_list(req_list: str) -> List[str]:
@@ -84,6 +81,27 @@ def missing_link_from_parent(requirement: Requirement, project: Project) -> bool
     return False
 
 
+def _to_variable(attribute_name: str) -> Optional[str]:
+    """
+    Takes an attribute name and converts it to a variable name for use in filters.
+    Returns None if the conversion fails (if replacing spaces with underscore fails to
+    produce something that can be a valid variable name).
+    """
+    return (
+        attribute_name.replace(" ", "_")
+        if re.fullmatch(r"\w[\w| |\n]*", attribute_name)
+        else None
+    )
+
+
+def add_req_fields(req: Requirement, names: Dict[str, Any], project: Project) -> None:
+    """Adds requirement attributes as variables available for use in an expression."""
+    for name in project.root_document.get_attribute_names_recursive():
+        as_variable = _to_variable(name)
+        if as_variable and as_variable not in names:
+            names[as_variable] = req[name] if name in req else ""
+
+
 def evaluate_requirement_against_filter(
     req: Requirement, project: Project, filter_expression: str
 ) -> bool:
@@ -103,10 +121,11 @@ def evaluate_requirement_against_filter(
 
     allowed_names = {
         "req": req,
-        "has_element": has_element,
+        "elements": elements,
         "has_invalid_link": has_invalid_link,
         "link_error": link_error,
     }
+    add_req_fields(req, allowed_names, project)
     code = compile(filter_expression, "<string>", "eval")
     for name in code.co_names:
         if name not in allowed_names:

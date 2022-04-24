@@ -34,8 +34,11 @@ def export_to_excel(outputpath: str, attributes: List[str], reqs:  Iterable[Dict
     wb.close()
 
 
-def main() -> None:
-    """main - main function"""
+def create_arg_parser() -> argparse.ArgumentParser:
+    """
+    Creates a command line argument parser.
+    The return value has variables named reqdoc and outputpath.
+    """
     parser = argparse.ArgumentParser(
         description="Get requirements from an asciidoc file"
     )
@@ -48,14 +51,21 @@ def main() -> None:
         dest="recursive",
         help="Parse specifications recursively and output all requirements",
     )
-    args = parser.parse_args()
+    return parser
 
+
+def main() -> None:
+    """main - main function"""
+
+    # Parse and validate arguments:
+    args = create_arg_parser().parse_args()
     extension = os.path.splitext(args.outputpath)[1]
     if extension not in [".cvs", ".xlsx"]:
         sys.exit(
             f"Supported output formats are CVS and XLSX, but {extension} was specified"
         )
 
+    # Parse the requirements and select the data for export:
     project = read_and_parse_project(args.reqdoc)
     reqs = (
         project.requirements.values()
@@ -63,6 +73,8 @@ def main() -> None:
         else project.root_document.reqs.values()
     )
     attributes = project.root_document.attribute_names
+
+    # Export to the correct format:
     if extension == ".cvs":
         export_to_csv(args.outputpath, attributes, reqs)
     elif extension == ".xlsx":

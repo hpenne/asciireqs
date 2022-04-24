@@ -62,6 +62,20 @@ class ReqDocument:
         """Adds a child document to 'child_docs'"""
         self.child_docs.append(child_doc)
 
+    def get_attribute_names_recursive(self) -> List[str]:
+        """Finds all attribute names used in this and all child/sub specifications"""
+        names : List[str] = []
+        _add_attribute_names(self, names)
+        for child_doc in self.child_docs:
+            _add_attribute_names(child_doc, names)
+        return names
+
+
+def _add_attribute_names(doc: ReqDocument, names: List[str]) -> None:
+    for name in doc.attribute_names:
+        if name not in names:
+            names.append(name)
+
 
 def add_attribute(req: Requirement, name: str, value: str) -> None:
     """Adds an attribute name/value pair to a requirement"""

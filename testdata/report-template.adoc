@@ -6,7 +6,7 @@
 
 == Requirements for release 1
 
-`asciireq-table: ID, Text, Tags; has_element(req["Tags"], "Rel-1")`
+`asciireq-table: ID, Text, Tags; "Rel-1" in elements(Tags)`
 
 == Requirements with broken links:
 

@@ -91,4 +91,4 @@ Parent: UR-RMS-REQ-033
 
 == Requirements for release 1
 
-`asciireq-table: ID, Text, Tags; has_element(req["Tags"], "Rel-1")`
+`asciireq-table: ID, Text, Tags; "Rel-1" in elements(Tags)`
