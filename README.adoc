@@ -2,24 +2,25 @@
 
 == What it is
 
-Requirement Management software is often complicated and inconvenient to use.
+Requirement Management software can be complicated and inconvenient to use.
 Support for collaboration and change management can be cumbersome and poor.
 What if we could instead store our requirements in git and use that for versioning and use pull requests for review and management of changes?
 
 This project is a (simple) parser for AsciiDoc files written in Python that will identify requirements in AsciiDoc files, and build a requirements project model from this.
-It then uses this to do reporting and data export, and will also post process the AsciiDoc files to insert cross-links and report data.
+It uses this to do reporting and data export, and will also post process the AsciiDoc files to insert cross-links and report data. This can then be turned into HTML or PDF by tools like AsciiDoctor.
 
 The parser supports requirement document hierarchies, and can find and report inconsistencies in requirement cross-links between documents.
 
-This allows complicated sets of product requirements to be written in AsciiDoc.
+This allows complicated sets of product requirements to be managed in AsciiDoc.
 
-AsciiReqs is to some degree inspired by Sphinxs-Needs
+AsciiReqs is to some degree inspired by Sphinx-Needs and Doorstop.
 
 == Status
 
-This is a prototype that I wrote out of frustration with an ancient and horrible (but common) Requirement Management System.  It was written to freshen up my Python skills.  It has some tests, but needs more and better error handling and more unit tests.
-
-Still, it is in a workable state and the current functionality is at a level where it can be useful.
+This is a prototype that I wrote out of frustration with an ancient (but common) Requirement Management System.
+I also wanted to freshen up my Python skills.
+Python is fun, so it ended up with more features than I had originally planned.
+It must still be considered a prototype, but it is in a workable state and the current functionality is at a level where it can be quite useful.
 
 == Features
 
@@ -29,25 +30,31 @@ AsciiReqs can:
 * Find requirements defined using blocks of YAML (and convert them to the term form in post-processing).
 * Find and parse sub specifications using AsciiDoc attributes, to parse a hierarchy of specifications.
 * Identify requirement links to parent and child requirements.
-* Post process requirement documents and insert AsciiDoc anchors and cross-links for the requirements, which turn into hyperlinks in the generated HTML.
+* Post process requirement documents and insert AsciiDoc anchors and cross-links for the requirements, which turn into hyperlinks in generated HTML.
 * Detect and execute inline "macros" that generate tables of requirements in the post processed document, based on arbitrary user-specified filters.
-* Export to CVS.
+* Export to CVS and Excel.
 
 == Possible future directions
 
 Incomplete list:
 
-* Export to other formats (e.g. ReqIF, Excel)
-* Import (of course)
+* Export to ReqIF
 * Set, add to or remove from attributes using external (imported) data.
   E.g. add a new attribute (or add a new value to an attribute) to all or many requirements using external data (e.g. CVS).
-* Four ways of defining requirements are supported (terms, YAML and two kinds of tables). This is a little excessive.
-  Perhaps the less useful ones should be deprecated.
+* Import (generate a document from CVS and/or ReqIF)
 
 == How does it work?
 
 Write your requirement specification in AsciiDoc.
-Define the requirements as terms or YAML.  Your document is where the requirements are actually stored, and everything else is post-processing.  Use your favourite version control system for storage, versioning and collaboration.
+Define the requirements as terms or YAML.
+Your document is where the requirements are actually stored, and everything else is post-processing.
+Use your favourite version control system for storage, versioning and collaboration.
+
+Asciireqs will parse these documents to build up an internal project model of your requirements.
+A second pass will then be made through the documents to post process them and generate modified Asciidoc fils to an output folder.
+The post-processing inserts navigable cross-links and also generates report tables based on macros that you can insert into the original documents.
+These tables use filters that you specify using Python expression syntax.
+You can also write custom report templates outside your specification documents, that can also be processed in the post-processing stage.
 
 === Defining requirements
 
@@ -66,6 +73,8 @@ The text can span multiple lines.
 Tags: V.1;
 Child: SW-RMS-REQ-011
 ----
+
+NOTE: The attribute "req-prefix" (see below) must be set to "UR-RMS-" so that AsciiReqs knows that the term is a requirement and not something else.
 
 This renders as:
 
@@ -107,7 +116,7 @@ Text: This is the text that defines the requirement
 ----
 -----
 
-Some may find this format easier to read and write while working with the requirements, but it leaves a little to be desired in the final print.
+Some may find this format easier to read and write while working with the requirements, but it will look odd in the final print.
 AsciiReqs will therefore transform this into an AsciiDoc "Term" in the following style when the adoc files are processed:
 
 UR-RMS-021::
@@ -159,7 +168,7 @@ The value is a comma separated list of child requirement documents.
 
 Adding the following line to the attribute section at the start of your document will define `child-reqs.adoc` and `child-reqs-2.adoc` as a child requirement documents:
 
-Note that the child documents must reside in the working folder (use of paths is not supported).
+Note that the child documents must reside in the same folder as the top level project document (use of paths is not supported).
 
 [source, asciidoc]
 ----
@@ -180,7 +189,7 @@ The following defines "SW-REQ-" as the prefix for the current document's require
 
 This attribute is necessary in order to identify the requirement IDs and insert cross-links when post-processing the documents.
 
-=== Running asciireqs
+=== Running AsciiReqs
 
 Invoke asciireq with the name of the top level requirement document and an option to specify the output directory:
 
@@ -215,25 +224,32 @@ Putting the following in a document will make ascireqs replace it with a require
 
 [source, asciidoc]
 ----
-`asciireq-table: ID, Text, Tags; has_element(req["Tags"], "Rel-1")`
+`asciireq-table: ID, Title, Line; "Rel-1" in elements(Tags)`
 ----
 
 The list after the colon is a list of the column headings to put in the table (each heading is a requirement property name).
 The list of property names can be followed by a semicolon and a filter expression.
 
-The filter expression is a Python expression operating on a requirement object.
-The requirement object is a variable named `req` and is a dictionary of property names and values (of type `str`).
+The filter expression is a Python expression operating on a limited set of variables and functions.
+If a requirement attribute name starts with a letter and contains only letters and numbers then the attribute value will available by its attribute name in expressions.
+Spaces are also permitted, but will be turned into underscores.
+The requirement object itself is also a variable named `req` and is a dictionary of property names and values (of type `str`).
 If the expression evaluates to true then the requirement will be in the table.
 
-In the example, the filter uses the helper function `has_element` to pick out all requirements where the "Tags" property contains the string "V.1".
+In the example, the filter references the Tag attribute.
+It uses the helper function `elements` which splits a comma separated string into a list of its comma separated elements.
+The filter therefore picks out any requirement that has "Rel-1" as one element of a comma-separated list in the Tag attribute.
 
 The following helper functions are defined (comparisons can also be used):
 
-* has_element: This takes a requirement property value as the first argument and a target string as the second, and returns true if the target string is found in the property value.
+* elements:
+Takes a string which should be a comma separated list, and returns the elements as a list of strings.
+Spaces before and after each element are removed and empty elements are discarded.
 
 * has_invalid_link: The is true if the Parent or Child attribute contains an unknown requirement ID.
 
-* link_error: This true if the requirement has a link to one or more parents, where the parent has no link back to the requirement.
+* link_error:
+This true if the requirement has a link to one or more parents, where the parent has no link back to the requirement.
 This is useful to generate tables of requirements with broken/inconsistent links.
 
 If the filter expression is omitted then all the requirements in the current document are put in the table.
