@@ -104,8 +104,24 @@ def test_req_from_yaml_lines_with_single_requirement() -> None:
         enumerate(source_block_marker + source_input + source_block_marker, start=1),
         doc_with_req_prefix(),
     )
-    assert len(req) == 1
-    assert req[0] == {ID: "SR-001", TEXT: "Some requirement", LINE_NO: str(2)}
+    assert req == [{ID: "SR-001", TEXT: "Some requirement", LINE_NO: str(2)}]
+
+
+def test_req_from_yaml_with_multi_line_text() -> None:
+    assert not req_from_yaml_lines(["ID: SR-001"], doc_with_req_prefix(), 13)
+    source_input = [
+        "ID: SR-001",
+        "Text: |",
+        "  Some requirement",
+        "",
+        "  This is the second paragraph",
+    ]
+    source_block_marker = ["----"]
+    req = req_from_yaml_block(
+        enumerate(source_block_marker + source_input + source_block_marker, start=1),
+        doc_with_req_prefix(),
+    )
+    assert req == [{ID: "SR-001", TEXT: "Some requirement\n\nThis is the second paragraph", LINE_NO: str(2)}]
 
 
 def test_req_from_yaml_lines_with_two_requirement() -> None:
@@ -145,7 +161,10 @@ def test_req_from_term_with_text_only() -> None:
 
 def test_req_from_term_with_multi_line_text() -> None:
     req = req_from_term(
-        "SR-001::", 2, enumerate(["Req. text1", "Req. text2"], start=3), doc_with_req_prefix()
+        "SR-001::",
+        2,
+        enumerate(["Req. text1", "Req. text2"], start=3),
+        doc_with_req_prefix(),
     )
     assert req == {ID: "SR-001", TEXT: "Req. text1\nReq. text2", LINE_NO: "2"}
 
@@ -154,7 +173,10 @@ def test_req_from_term_with_attributes() -> None:
     req = req_from_term(
         "SR-001::",
         2,
-        enumerate(["Req. text1", "Req. text2", "+", "Child: R-01, R-02; Parent: UR-01"], start=3),
+        enumerate(
+            ["Req. text1", "Req. text2", "+", "Child: R-01, R-02; Parent: UR-01"],
+            start=3,
+        ),
         doc_with_req_prefix(),
     )
     assert req == {

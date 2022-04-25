@@ -64,7 +64,7 @@ class ReqDocument:
 
     def get_attribute_names_recursive(self) -> List[str]:
         """Finds all attribute names used in this and all child/sub specifications"""
-        names : List[str] = []
+        names: List[str] = []
         _add_attribute_names(self, names)
         for child_doc in self.child_docs:
             _add_attribute_names(child_doc, names)

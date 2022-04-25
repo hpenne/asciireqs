@@ -23,21 +23,21 @@ This a sample requirement specification for testing of asciireqs, containing use
 
 === Data management and collaboration
 
-Reqirements are written as AsciiDoc "terms":
+Requirements are written as AsciiDoc "terms":
 
 UR-RMS-REQ-011::
-The SW shall support an internally hosted central data store.
+The SW shall support an centrally hosted data store.
 +
 Tags: Rel-1;
 Child: SW-RMS-REQ-011
 
 UR-RMS-REQ-012::
-The SW shall support versioning and baselining
+The SW shall support versioning and baselining.
 +
 Tags: Rel-2
 
 UR-RMS-REQ-013::
-The SW shall support review of changes and store the history of the review and approval process.
+The SW shall support review of changes, and store the history of the review and approval process.
 +
 Tags: Rel-2
 

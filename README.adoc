@@ -152,14 +152,14 @@ The "Text" field for the second requirement will be split across two lines in th
 ==== Requirement properties
 
 The requirements consist of named properties with values.
-The following property names are treated specially by asciireqs:
+The following property names are treated specially by AsciiReqs:
 
 * ID: The requirement identifier
 * Title: This is the title identified just after the ID when parsing term-requirements.
 * Text: This is the requirement text identified just after the ID/Title when parsing term-requirements.
 * Child: The value is interpreted as a comma separated list of requirement identifiers for child requirements in a sub specification (links from a high level requirement to requirement further down in the specification hierarchy)
 * Parent: The value is interpreted as a comma separated list of requirement identifiers linking up to parent requirements higher in the hierarchy.
-* Line: This attribute is set by asciireqs to the line number where the requirement was found.
+* Line: This attribute is set by AsciiReqs to the line number where the requirement was found.
 
 ==== Child specifications
 
@@ -179,7 +179,7 @@ Asciireqs will parse these documents as well, as child documents in the specific
 
 ==== Other document attributes
 
-You also need to define an attribute to tell asciireqs the prefix string for your requirement IDs.
+You also need to define an attribute to tell AsciiReqs the prefix string for your requirement IDs.
 The following defines "SW-REQ-" as the prefix for the current document's requirements (meaning that all requirement IDs are "SW-REQ-" followed by one or more digits):
 
 [source, asciidoc]
@@ -191,14 +191,14 @@ This attribute is necessary in order to identify the requirement IDs and insert 
 
 === Running AsciiReqs
 
-Invoke asciireq with the name of the top level requirement document and an option to specify the output directory:
+Invoke AsciiReqs with the name of the top level requirement document and an option to specify the output directory:
 
 [source, bash]
 ----
 asciireq -o outputdir my-spec.adoc
 ----
 
-This will make asciireq parse my-spec.adoc and all child documents (recursively).
+This will make Asciireqs parse my-spec.adoc and all child documents (recursively).
 Parsing is followed by post-processing.
 This writes each document to the output directory ("outputdir" in the example).
 These documents have all requirements turned into hyperlinks which also work across documents, to make the specification hierarchy easy to navigate.
@@ -207,7 +207,7 @@ Report generation macros are also processed, to put extra report data in the out
 
 === Report generation macros
 
-There are currently two "macros" that will be expanded by the post processing done by asciireqs:
+There are currently two "macros" that will be expanded by the post processing done by AsciiReqs:
 
 ==== The document hierarchy macro
 
@@ -240,7 +240,7 @@ In the example, the filter references the Tag attribute.
 It uses the helper function `elements` which splits a comma separated string into a list of its comma separated elements.
 The filter therefore picks out any requirement that has "Rel-1" as one element of a comma-separated list in the Tag attribute.
 
-The following helper functions are defined (comparisons can also be used):
+The following helper functions are supported (Python comparisons and keywords can also be used):
 
 * elements:
 Takes a string which should be a comma separated list, and returns the elements as a list of strings.
@@ -251,6 +251,10 @@ Spaces before and after each element are removed and empty elements are discarde
 * link_error:
 This true if the requirement has a link to one or more parents, where the parent has no link back to the requirement.
 This is useful to generate tables of requirements with broken/inconsistent links.
+
+* startswith: The standard startswith function from the str class.
+
+* re.fullmatch, re.search, re.match: String matching functions from the "re" namespace.
 
 If the filter expression is omitted then all the requirements in the current document are put in the table.
 

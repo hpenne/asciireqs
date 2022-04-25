@@ -1,4 +1,6 @@
 """tests_reporting - Tests for reporting.py"""
+import pytest
+
 from asciireqs.docparser import Project
 from asciireqs.fields import ID, LINE_NO, TEXT, PARENT, CHILD, TITLE
 from asciireqs.reporting import (
@@ -107,6 +109,28 @@ def test_filter_that_looks_for_tag() -> None:
     )
     assert not evaluate_requirement_against_filter(
         project.requirements["SR-1"], project, '"Version2" in elements(Tags)'
+    )
+
+
+def test_filter_that_uses_unpermitted_name() -> None:
+    project = get_project_for_filter_tests()
+    with pytest.raises(NameError):
+        assert evaluate_requirement_against_filter(
+            project.requirements["SR-1"], project, 'Parent.endswith("Foo")'
+        )
+
+
+def test_filter_that_uses_startswith() -> None:
+    project = get_project_for_filter_tests()
+    assert evaluate_requirement_against_filter(
+        project.requirements["SR-1"], project, 'Parent.startswith("UR-")'
+    )
+
+
+def test_filter_that_uses_re_fullmatch() -> None:
+    project = get_project_for_filter_tests()
+    assert evaluate_requirement_against_filter(
+        project.requirements["SR-1"], project, 're.fullmatch("UR-\\d+", Parent)'
     )
 
 

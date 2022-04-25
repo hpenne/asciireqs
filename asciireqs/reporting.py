@@ -124,6 +124,11 @@ def evaluate_requirement_against_filter(
         "elements": elements,
         "has_invalid_link": has_invalid_link,
         "link_error": link_error,
+        "startswith": str.startswith,
+        "re": re,
+        "fullmatch": re.fullmatch,
+        "search": re.search,
+        "match": re.match,
     }
     add_req_fields(req, allowed_names, project)
     code = compile(filter_expression, "<string>", "eval")
@@ -131,7 +136,7 @@ def evaluate_requirement_against_filter(
         if name not in allowed_names:
             raise NameError(f"Use of {name} not allowed")
     # pylint: disable=W0123
-    return eval(filter_expression, {"__builtins__": {}}, allowed_names) is True
+    return bool(eval(filter_expression, {"__builtins__": {}}, allowed_names))
 
 
 def table_line(req: Requirement, attribute_names: List[str]) -> Optional[str]:

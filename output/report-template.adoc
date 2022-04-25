@@ -11,7 +11,7 @@
 |ID |Text |Tags 
 
 |xref:req-tool-user-reqs.adoc#UR-RMS-REQ-011[UR-RMS-REQ-011]
-|The SW shall support an internally hosted central data store.
+|The SW shall support an centrally hosted data store.
 
 |Rel-1
 
