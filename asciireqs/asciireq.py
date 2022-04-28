@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""asciireq - This is the main program to parse requirements and generate reports"""
+"""This is the main program to parse requirements and generate reports"""
 
 import argparse
 import os

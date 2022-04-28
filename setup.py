@@ -40,10 +40,14 @@ setup(
     package_dir={'': 'asciireqs'},
     packages=find_packages(where='asciireqs'),
     python_requires='>=3.7, <4',
-    # install_requires=[],
+    install_requires=[
+        "PyYAML",
+        "openpyxl"
+    ],
     entry_points={  # Optional
         'console_scripts': [
-            'asciireqs=asciireqs:main',
+            'asciireq=asciireqs.asciireq:main',
+            'asciireqexport=asciireqs.asciireqexport:main'
         ],
     }
 )

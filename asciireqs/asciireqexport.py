@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""asciireq-export - Export requirements to CVS format"""
+"""Export requirements to CVS format"""
 
 import argparse
 import os
