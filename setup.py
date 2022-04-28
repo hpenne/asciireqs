@@ -6,8 +6,8 @@ long_description = (here / 'README.adoc').read_text(encoding='utf-8')
 
 setup(
     name="asciireqs",
-    version='0.0.1',
-    description='A simple Requirement Management System using asciidoc',
+    version='0.0.2',
+    description='A simple text-based Requirement Management System using asciidoc',
     long_description=long_description,
     long_description_content_type='text/markdown',
     # url='https://github.com/pypa/sampleproject',
