@@ -4,14 +4,15 @@
 import argparse
 import os
 from typing import List, Dict, Iterable
-
 import sys
-
-from asciireqs.docparser import read_and_parse_project
 import openpyxl
 
+from asciireqs.docparser import read_and_parse_project
 
-def export_to_csv(outputpath: str, attributes: List[str], reqs:  Iterable[Dict[str, str]]) -> None:
+
+def export_to_csv(
+    outputpath: str, attributes: List[str], reqs: Iterable[Dict[str, str]]
+) -> None:
     """Exports the requirements to a CSV file"""
     with open(outputpath, "w", encoding="utf-8") as csv_file:
         csv_file.write(",".join(attributes))
@@ -23,15 +24,17 @@ def export_to_csv(outputpath: str, attributes: List[str], reqs:  Iterable[Dict[s
             csv_file.write("\n")
 
 
-def export_to_excel(outputpath: str, attributes: List[str], reqs:  Iterable[Dict[str, str]]) -> None:
+def export_to_excel(
+    outputpath: str, attributes: List[str], reqs: Iterable[Dict[str, str]]
+) -> None:
     """Exports the requirements to an XSLX Excel file"""
-    wb = openpyxl.Workbook()
-    ws = wb.active
-    ws.append(attributes)
+    workbook = openpyxl.Workbook()
+    worksheet = workbook.active
+    worksheet.append(attributes)
     for req in reqs:
-        ws.append([req[key] if key in req else "" for key in attributes])
-    wb.save(outputpath)
-    wb.close()
+        worksheet.append([req[key] if key in req else "" for key in attributes])
+    workbook.save(outputpath)
+    workbook.close()
 
 
 def create_arg_parser() -> argparse.ArgumentParser:
