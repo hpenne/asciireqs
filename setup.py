@@ -37,8 +37,7 @@ setup(
         'Programming Language :: Python :: 3 :: Only',
     ],
     # keywords='sample, setuptools, development',  # Optional
-    package_dir={'': 'asciireqs'},
-    packages=find_packages(where='asciireqs'),
+    packages=find_packages(),
     python_requires='>=3.7, <4',
     install_requires=[
         "PyYAML",
