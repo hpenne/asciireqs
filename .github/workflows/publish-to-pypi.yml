@@ -1,6 +1,6 @@
 name: Publish Python 🐍 distributions 📦 to PyPI and TestPyPI
 
-on: push
+on: release
 
 jobs:
   build-n-publish:
@@ -28,6 +28,7 @@ jobs:
           --outdir dist/
           .
       - name: Publish distribution 📦 to Test PyPI
+        if: ${{ github.ref == 'refs/heads/master' }}
         uses: pypa/gh-action-pypi-publish@master
         with:
           password: ${{ secrets.TEST_PYPI_API_TOKEN }}
