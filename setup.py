@@ -24,7 +24,7 @@ setup(
         'Intended Audience :: Developers',
         "Topic :: Documentation",
         "Topic :: Utilities",
-        "Topic :: Text Processing :: Markup"
+        "Topic :: Text Processing :: Markup",
         "Topic :: Software Development :: Documentation",
 
         # Pick your license as you wish
