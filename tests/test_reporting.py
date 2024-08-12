@@ -23,14 +23,14 @@ def doc1_reqs() -> Requirements:
 
 def docs_with_req_prefix() -> ReqDocument:
     doc = ReqDocument()
-    doc.req_prefix = "UR-REQ-"
+    doc.req_regex = r"UR-REQ-\d+"
     doc.name = "ur-reqs.adoc"
     child_doc1 = ReqDocument()
-    child_doc1.req_prefix = "SW-REQ-"
+    child_doc1.req_regex = r"SW-REQ-\d+"
     child_doc1.name = "sw-reqs.adoc"
     doc.add_child_doc(child_doc1)
     child_doc2 = ReqDocument()
-    child_doc2.req_prefix = "HW-REQ-"
+    child_doc2.req_regex = r"HW-REQ-\d+"
     child_doc2.name = "hw-reqs.adoc"
     doc.add_child_doc(child_doc2)
     return doc
@@ -186,7 +186,7 @@ def test_missing_link_from_parent_two_of_two_downlinks_ok() -> None:
 
 def test_requirement_as_term() -> None:
     ur = ReqDocument()
-    ur.req_prefix = "UR-"
+    ur.req_regex = r"UR-\d+"
     ur.name = "ur.adoc"
     ur.reqs["UR-1"] = {
         ID: "UR-1",
@@ -212,7 +212,7 @@ def test_requirement_as_term() -> None:
 
 def test_requirement_as_term_with_title() -> None:
     ur = ReqDocument()
-    ur.req_prefix = "UR-"
+    ur.req_regex = r"UR-\d+"
     ur.name = "ur.adoc"
     ur.reqs["UR-1"] = {
         ID: "UR-1",

@@ -74,7 +74,7 @@ Tags: V.1;
 Child: SW-RMS-REQ-011
 ----
 
-NOTE: The attribute "req-prefix" (see below) must be set to "UR-RMS-" so that AsciiReqs knows that the term is a requirement and not something else.
+NOTE: The attribute "req-regex" (see below) must be set to "UR-RMS-\d+" so that AsciiReqs knows that the term is a requirement and not something else.
 
 This renders as:
 
@@ -179,12 +179,13 @@ Asciireqs will parse these documents as well, as child documents in the specific
 
 ==== Other document attributes
 
-You also need to define an attribute to tell AsciiReqs the prefix string for your requirement IDs.
-The following defines "SW-REQ-" as the prefix for the current document's requirements (meaning that all requirement IDs are "SW-REQ-" followed by one or more digits):
+You also need to define an attribute to tell AsciiReqs the pattern for your requirement IDs.
+This uses normal "regex" syntax.
+The following defines "SW-REQ-" as the prefix for the current document's requirements (all requirement IDs are "SW-REQ-" followed by one or more digits):
 
 [source, asciidoc]
 ----
-:req-prefix: SW-REQ-
+:req_regex: SW-REQ-\d+
 ----
 
 This attribute is necessary in order to identify the requirement IDs and insert cross-links when post-processing the documents.

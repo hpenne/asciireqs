@@ -25,7 +25,7 @@ class ReqDocument:
     reqs: Requirements
     child_doc_files: List[str]
     child_docs: List[ReqDocument]
-    req_prefix: str
+    req_regex: str
 
     def __init__(self) -> None:
         self.name = ""
@@ -33,7 +33,7 @@ class ReqDocument:
         self.reqs: Requirements = {}
         self.child_doc_files: List[str] = []
         self.child_docs: List[ReqDocument] = []
-        self.req_prefix: str = ""
+        self.req_regex: str = ""
 
     def _add_keys(self, keys: List[str]) -> None:
         """Takes a list of requirement attribute names, and adds new ones to 'attribute_names'"""

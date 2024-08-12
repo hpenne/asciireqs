@@ -62,8 +62,8 @@ def get_source_block(lines: Iterable[Tuple[int, str]]) -> Tuple[List[str], int]:
 
 def validate_requirement(req: Requirement, doc: ReqDocument, line_no: int) -> bool:
     """Takes a Requirement and verifies that it contains the required attributes"""
-    if not doc.req_prefix:
-        print("Error: Document has no req-prefix attribute")
+    if not doc.req_regex:
+        print("Error: Document has no req_regex attribute")
         return False
     if ID not in req:
         print(f"Error: Missing ID attribute on line {line_no}")
@@ -71,7 +71,7 @@ def validate_requirement(req: Requirement, doc: ReqDocument, line_no: int) -> bo
     if TEXT not in req:
         print(f"Error: Missing Text attribute on line {line_no}")
         return False
-    if not req[ID].startswith(doc.req_prefix):
+    if not re.match(f"{doc.req_regex}", req[ID]):
         print(f"Error: Wrong ID format on line {line_no}")
         return False
     return True
@@ -91,7 +91,7 @@ def req_from_yaml_lines(
         return []
 
     reqs = []
-    if next(iter(attributes.keys())).startswith(doc.req_prefix):
+    if re.match(f"{doc.req_regex}", next(iter(attributes.keys()))):
         # This is dict of requirements:
         for req_id, attrs in attributes.items():
             req = {name: str(value).strip(" \n") for name, value in attrs.items()}
@@ -183,7 +183,7 @@ def req_from_term(
     :param doc: The document that is being parsed
     :return: The requirement (or None if not found)
     """
-    match = re.fullmatch(rf"({doc.req_prefix}\d+)::", first_line.strip())
+    match = re.fullmatch(f"({doc.req_regex})::", first_line.strip())
     if match:
         req = {ID: match.group(1), LINE_NO: str(line_no)}
         try:
@@ -242,9 +242,9 @@ def parse_doc(lines: Iterable[Tuple[int, str]]) -> ReqDocument:
                 doc.child_doc_files = [
                     file_name.strip() for file_name in attribute_value.split(",")
                 ]
-            attribute_value = get_attribute(text, "req-prefix")
+            attribute_value = get_attribute(text, "req_regex")
             if attribute_value:
-                doc.req_prefix = attribute_value
+                doc.req_regex = attribute_value
     return doc
 
 

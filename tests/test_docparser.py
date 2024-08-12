@@ -18,13 +18,13 @@ def empty() -> Tuple[str, int]:
 
 def doc_with_req_prefix() -> ReqDocument:
     doc = ReqDocument()
-    doc.req_prefix = "SR-"
+    doc.req_regex = r"SR-\d+"
     return doc
 
 
 def test_validate_requirement() -> None:
     doc = ReqDocument()
-    doc.req_prefix = "SR-"
+    doc.req_regex = r"SR-\d+"
     assert validate_requirement({ID: "SR-1", TEXT: "Some text"}, doc, 2)
 
 
@@ -35,7 +35,7 @@ def test_validate_requirement_no_req_prefix_attribute() -> None:
 
 def test_validate_requirement_no_id_field() -> None:
     doc = ReqDocument()
-    doc.req_prefix = "SR-"
+    doc.req_regex = r"SR-\d+"
     assert not validate_requirement({TEXT: "Some text"}, doc, 2)
 
 
@@ -47,7 +47,7 @@ def test_validate_requirement_wrong_id_prefix() -> None:
 
 def test_validate_requirement_no_text_field() -> None:
     doc = ReqDocument()
-    doc.req_prefix = "SR-"
+    doc.req_prefix = r"SR-\d+"
     assert not validate_requirement({ID: "SR-1"}, doc, 2)
 
 

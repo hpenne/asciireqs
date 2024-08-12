@@ -201,8 +201,8 @@ def line_numbers_for_requirements(requirements: Requirements) -> Dict[int, str]:
 
 def insert_requirement_links(line: str, doc: ReqDocument) -> str:
     """Takes a line of AsciiDoc text and adds cross-links to requirement IDs"""
-    if doc.req_prefix:
-        line = re.sub(rf"({doc.req_prefix}\d+)", f"xref:{doc.name}#\\1[\\1]", line)
+    if doc.req_regex:
+        line = re.sub(f"({doc.req_regex})", f"xref:{doc.name}#\\1[\\1]", line)
     for child_doc in doc.child_docs:
         line = insert_requirement_links(line, child_doc)
     return line

@@ -1,4 +1,4 @@
-setuptools~=65.5.1
+setuptools~=72.1.0
 PyYAML~=5.4.1
 types-PyYAML~=6.0.5
 openpyxl
