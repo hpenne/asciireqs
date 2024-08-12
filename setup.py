@@ -41,7 +41,7 @@ setup(
     ],
     keywords='Requirement Management, version control, git, text-based, AsciiDoc',
     packages=find_packages(),
-    python_requires=">=3.7, <4",
+    python_requires=">=3.8, <4",
     install_requires=["PyYAML", "openpyxl"],
     entry_points={  # Optional
         "console_scripts": [
