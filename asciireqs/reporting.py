@@ -271,10 +271,9 @@ def generate_report_line(
                 param.strip() for param in stripped_line[16:-1].strip().split(";")
             ]
             field_names = [name.strip() for name in field_name_list.strip().split(",")]
-            for line in get_table(
+            yield from get_table(
                 project, requirements, field_names, filter_expression
-            ):
-                yield line
+            )
         elif stripped_line.startswith("[.reqy]") and doc:
             # Consume the listing block of YAML:
             for yaml_req in req_from_yaml_block(input_lines, doc):
