@@ -181,7 +181,7 @@ Asciireqs will parse these documents as well, as child documents in the specific
 
 You also need to define an attribute to tell AsciiReqs the pattern for your requirement IDs.
 This uses normal "regex" syntax.
-The following defines "SW-REQ-" as the prefix for the current document's requirements (all requirement IDs are "SW-REQ-" followed by one or more digits):
+The following defines "SW-REQ-" as the prefix for the current document's requirements, followed by one or more digits (all requirement IDs are "SW-REQ-" followed by one or more digits):
 
 [source, asciidoc]
 ----
