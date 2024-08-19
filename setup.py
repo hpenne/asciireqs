@@ -6,7 +6,7 @@ long_description = (here / "long-description.md").read_text(encoding="utf-8")
 
 setup(
     name="asciireqs",
-    version="0.0.6",
+    version="0.0.5",
     description="Text-based Requirement Management using AsciiDoc and version control",
     long_description=long_description,
     long_description_content_type="text/markdown",
