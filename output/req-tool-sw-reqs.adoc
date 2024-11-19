@@ -4,7 +4,7 @@
 :sectnums:
 :sectnumlevels: 3
 :disclosure: Internal
-:req-prefix: SW-RMS-REQ-
+:req_regex: SW-RMS-REQ-\d+
 
 This is a page after the cover, where approval and history will go.
 
